@@ -1,1 +1,54 @@
-/* Estilos globales */
+/* ==== Configuración Global ==== */
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Sobrescribir el color primario de Bootstrap */
+:root {
+    --bs-primary: #00796B; /* Un tono verde azulado (teal) para viajes */
+    --bs-primary-rgb: 0, 121, 107;
+}
+
+/* Esta es la regla que cambia el botón de azul a verde */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+    background-color: #004D40; /* Un tono más oscuro */
+    border-color: #004D40;
+}
+
+.btn-outline-primary {
+    color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--bs-primary);
+    color: #fff;
+}
+
+.text-primary {
+    color: var(--bs-primary) !important;
+}
+
+.badge.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+app-root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+app-footer {
+    margin-top: auto;
+}
