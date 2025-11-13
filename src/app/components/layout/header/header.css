@@ -1,0 +1,13 @@
+
+.navbar {
+    transition: background-color 0.3s ease-in-out;
+}
+
+.navbar-scrolled {
+    background-color: #212529; /* Un fondo oscuro sólido al hacer scroll */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}

@@ -5,8 +5,8 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './user-profile.html',
-  styleUrl: './user-profile.css',
+  styleUrls: ['./user-profile.css']
 })
-export class UserProfile {
-
+export class UserProfileComponent {
+  // 'export class UserProfileComponent' soluciona el error
 }
