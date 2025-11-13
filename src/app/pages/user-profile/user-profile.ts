@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   templateUrl: './user-profile.html',
   styleUrls: ['./user-profile.css'],
 })
-export class UserProfile {
+export class UserProfileComponent {
   // Datos de ejemplo; en producción llegan desde el backend
   user = {
     username: 'maria_g',
