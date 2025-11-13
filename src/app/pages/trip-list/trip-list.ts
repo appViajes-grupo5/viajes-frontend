@@ -5,8 +5,8 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './trip-list.html',
-  styleUrl: './trip-list.css',
+  styleUrls: ['./trip-list.css']
 })
-export class TripList {
-
+export class TripListComponent {
+  
 }

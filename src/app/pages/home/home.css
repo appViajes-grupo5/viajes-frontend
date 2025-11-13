@@ -1,0 +1,36 @@
+/* ... */
+/* ==== Hero Section ==== */
+.hero-section {
+    height: 100vh;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("/assets/images/header.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+section {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+}
+
+#how-it-works .card {
+    transition: transform 0.2s ease-in-out;
+}
+
+#how-it-works .card:hover {
+    transform: translateY(-5px);
+}
+
+/* ==== Viajes Destacados (Cards) ==== */
+#featured-trips .card {
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+#featured-trips .card:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+#featured-trips .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
