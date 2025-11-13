@@ -5,8 +5,8 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './trip-detail.html',
-  styleUrl: './trip-detail.css',
+  styleUrls: ['./trip-detail.css']
 })
-export class TripDetail {
-
+export class TripDetailComponent {
+  // 'export class TripDetailComponent' soluciona el error
 }
