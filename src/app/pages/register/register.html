@@ -1,0 +1,87 @@
+
+<div class="page-container d-flex align-items-center py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+
+      <div class="col-md-7">
+
+
+        <div class="card shadow-lg border-0 rounded-lg">
+          <div class="card-body p-4 p-md-5">
+
+            <h2 class="text-center mb-4 fw-bold">Crea tu cuenta</h2>
+
+            <!-- Tu formulario reactivo (este código ya lo tenías) -->
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+              <!-- Campo Nombre -->
+              <div class="mb-3">
+                <label for="registerName" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="registerName"
+                       formControlName="registerName"
+                       [class.is-invalid]="name?.invalid && name?.touched">
+                @if (name?.errors?.['required'] && name?.touched) {
+                  <div class="invalid-feedback">Por favor, introduce tu nombre.</div>
+                }
+              </div>
+
+              <!-- Campo Email -->
+              <div class="mb-3">
+                <label for="registerEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="registerEmail"
+                       formControlName="registerEmail"
+                       [class.is-invalid]="email?.invalid && email?.touched">
+                @if (email?.errors?.['required'] && email?.touched) {
+                  <div class="invalid-feedback">Por favor, introduce un email.</div>
+                } @else if (email?.errors?.['email'] && email?.touched) {
+                  <div class="invalid-feedback">El formato del email no es válido.</div>
+                }
+              </div>
+
+              <!-- Campo Contraseña -->
+              <div class="mb-3">
+                <label for="registerPassword" class="form-label">Contraseña</label>
+                <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                       id="registerPassword"
+                       formControlName="registerPassword"
+                       [class.is-invalid]="password?.invalid && password?.touched">
+                @if (password?.errors?.['required'] && password?.touched) {
+                  <div class="invalid-feedback">Por favor, introduce tu contraseña.</div>
+                } @else if (password?.errors?.['minlength'] && password?.touched) {
+                  <div class="invalid-feedback">La contraseña debe tener al menos 6 caracteres.</div>
+                }
+              </div>
+
+              <!-- Campo Confirmar Contraseña -->
+              <div class="mb-3">
+                <label for="registerPasswordConfirm" class="form-label">Confirmar Contraseña</label>
+                <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                       id="registerPasswordConfirm"
+                       formControlName="registerPasswordConfirm"
+                       [class.is-invalid]="(passwordConfirm?.invalid || registerForm.errors?.['passwordsDoNotMatch']) && passwordConfirm?.touched">
+                @if (passwordConfirm?.errors?.['required'] && passwordConfirm?.touched) {
+                  <div class="invalid-feedback">Por favor, confirma tu contraseña.</div>
+                }
+                @if (registerForm.errors?.['passwordsDoNotMatch'] && passwordConfirm?.touched) {
+                  <div class="invalid-feedback">Las contraseñas no coinciden.</div>
+                }
+              </div>
+
+
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="registerShowPassword" (change)="toggleShowPassword()">
+                <label class="form-check-label" for="registerShowPassword">Mostrar contraseñas</label>
+              </div>
+
+              <!-- Botón (será verde gracias a src/styles.css) -->
+              <button type="submit" class="btn btn-primary w-100 btn-lg mt-3" [disabled]="registerForm.invalid">
+                Registrarse
+              </button>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

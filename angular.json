@@ -5,7 +5,17 @@
   "projects": {
     "viajes-frontend": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+  "@schematics/angular:component": {
+    "standalone": true
+  },
+  "@schematics/angular:directive": {
+    "standalone": true
+  },
+  "@schematics/angular:pipe": {
+    "standalone": true
+  }
+},
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -22,11 +32,17 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
             "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.min.css",
               "src/styles.css"
-            ]
+            ],
+            "scripts": [
+            "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+          ]
           },
           "configurations": {
             "production": {
@@ -88,5 +104,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
