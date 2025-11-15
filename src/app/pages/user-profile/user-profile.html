@@ -141,5 +141,55 @@
       </div>
 
     </div>
+<<<<<<< HEAD
   </div>
+=======
+<!-- Perfil de usuario: héroe con título grande y tarjeta centrada -->
+<div class="profile-hero d-flex align-items-center justify-content-center text-center">
+	<div class="overlay"></div>
+		<div class="hero-content container text-center position-relative">
+			<!-- Mostrar el nombre grande -->
+			<h1 class="hero-title display-1 fw-bold">Perfil de Usuario - {{ user.name }}</h1>
+			<p class="lead text-light mb-4">@{{ user.username }} — Revisa y edita tu información personal</p>
+
+				<div class="profile-card card mx-auto p-5 shadow-lg">
+					<button type="button" class="btn btn-sm btn-outline-primary back-btn" (click)="goBack()">← Volver</button>
+				<div class="d-flex flex-column flex-md-row align-items-center">
+					<div class="avatar mb-3 mb-md-0 me-md-5">
+						<img [src]="avatarDataUrl ? avatarDataUrl : defaultAvatarUrl" alt="Avatar" class="rounded-circle img-fluid" />
+					</div>
+
+					<div class="flex-fill text-md-start">
+						<h2 class="mb-1 display-6">{{ user.name }}</h2>
+						<p class="text-muted mb-1 fs-5">@{{ user.username }}</p>
+						<p class="mb-1 fs-5"><strong>Nombre: </strong> <span class="value">{{ user.name }}</span></p>
+						<p class="mb-1 fs-5"><strong>Apellidos: </strong> <span class="value">{{ user.apellidos }}</span></p>
+						<p class="mb-1 fs-5"><strong>Intereses: </strong>
+							<span class="interests-list value">{{ user.interests.join(', ') }}</span>
+						</p>
+						<p class="mb-2 fs-5"><strong>Bibliografía: </strong> <span class="value">{{ user.bio }}</span></p>
+						<p class="mb-1 fs-5"><strong>Email: </strong> <span class="value">{{ user.email }}</span></p>
+						<p class="mb-3 fs-5"><strong>Tel: </strong> <span class="value">{{ user.phone }}</span></p>
+
+						<!-- Valoración: 5 estrellas (rellenas según user.rating) -->
+						<div class="rating mb-3" aria-label="Rating">
+							<span class="star" [class.filled]="user.rating >= 1">★</span>
+							<span class="star" [class.filled]="user.rating >= 2">★</span>
+							<span class="star" [class.filled]="user.rating >= 3">★</span>
+							<span class="star" [class.filled]="user.rating >= 4">★</span>
+							<span class="star" [class.filled]="user.rating >= 5">★</span>
+							<span class="ms-2 text-muted">{{ user.rating }} / 5</span>
+						</div>
+
+						<div class="d-flex flex-wrap align-items-center">
+							<label class="photo-btn">
+								Cargar foto
+								<input type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+	</div>
+>>>>>>> 3088fd1db9adce5ad611f292f633ada745a54a06
 </div>
