@@ -49,4 +49,277 @@
 .form-control:focus {
     border-color: var(--bs-primary);
     box-shadow: 0 0 0 0.25rem rgba(0, 121, 107, 0.25); /* Sombra verde teal */
+/* Estilos mínimos para el perfil.
+   Fondo en src/app/img/header.jpeg (ruta relativa a este archivo).
+*/
+
+/* Fuente Inter (profesional) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+.profile-hero {
+   /* El héroe respeta alto de header/footer; la imagen está en ::before */
+   min-height: calc(100vh - var(--header-height, 64px) - var(--footer-height, 64px));
+   background: transparent; /* imagen en pseudo-elemento fijo */
+   background-color: #222; /* fallback */
+   position: relative;
+   z-index: 1; /* contenido sobre el fondo */
+   display: flex;
+   align-items: flex-start;
+   justify-content: center;
+   color: #fff;
+   padding: 4rem 0 2rem 0;
+}
+
+/* Aplicar fuente al héroe y tarjeta */
+.profile-hero,
+.profile-hero .hero-content,
+.profile-card {
+   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+/* Pesos de fuente más ligeros */
+.profile-hero .hero-title,
+.profile-card h2 {
+   font-weight: 600;
+   letter-spacing: -0.2px;
+}
+
+.profile-card p,
+.profile-card .lead,
+.profile-card .fs-5 {
+   font-weight: 400;
+}
+
+/* Fondo fijo a pantalla completa (detrás de nav/footer). */
+.profile-hero::before {
+   content: "";
+   position: fixed;
+   inset: 0;
+   background: url('../../img/header.jpeg') center/cover no-repeat;
+   background-attachment: fixed;
+   /* Oscurecer imagen */
+   filter: brightness(0.69) contrast(0.98);
+   z-index: -1;
+   pointer-events: none;
+}
+
+/* Contenedor del héroe a ancho completo (solo aquí). */
+.profile-hero .container {
+   max-width: none !important;
+   width: 100% !important;
+   padding-left: 1rem;
+   padding-right: 1rem;
+}
+
+/* Fin sección mínima */
+
+/* Tarjeta desenfocada para la información del usuario */
+
+.profile-card {
+   /* Ancho amplio (casi borde a borde) */
+   width: calc(100% - 2rem); /* casi borde a borde */
+   max-width: 1600px; /* máximo amplio */
+   margin: 0.8rem auto; /* centrado */
+   background: rgba(255,255,255,0.10);
+   color: #111827;
+   border-radius: 12px;
+   padding: 2.5rem 3rem; /* padding aumentado */
+   box-shadow: 0 12px 40px rgba(2,6,23,0.45);
+   border: 1px solid rgba(255,255,255,0.18);
+   backdrop-filter: blur(12px) saturate(120%);
+   -webkit-backdrop-filter: blur(12px) saturate(120%);
+   position: relative; /* para posicionar botones absolute */
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 1024px) {
+   .profile-card {
+      width: calc(100% - 1.5rem);
+   padding: 1.5rem 1.5rem; /* padding tablet */
+      margin: 1rem auto;
+      border-radius: 10px;
+   }
+}
+
+@media (max-width: 480px) {
+   .profile-card {
+      width: calc(100% - 1rem);
+   padding: 1rem 1rem; /* padding móvil */
+      margin: 0.6rem auto;
+   }
+}
+
+/* Escala tipográfica para el perfil */
+.profile-hero .hero-title {
+   font-size: clamp(2.4rem, 6vw, 5.5rem); /* much larger on wide screens */
+   line-height: 1.02;
+}
+
+/* Elevar ligeramente el título del héroe */
+
+.profile-hero .hero-title {
+   margin-top: -1.2rem;
+}
+
+/* Alinear borde izquierdo del título con la tarjeta */
+.profile-hero .hero-content {
+   display: flex;
+   flex-direction: column;
+   align-items: center; /* centrar pero controlar ancho del título */
+}
+
+.profile-hero .hero-title {
+   width: calc(100% - 2rem);
+   max-width: 1600px;
+   margin-left: auto;
+   margin-right: auto;
+   padding-left: 1.5rem; /* igual padding que la tarjeta */
+   padding-right: 1.5rem;
+   text-align: left; /* align title text to the left edge of the card */
+}
+
+/* Mover subtítulo más cerca del título */
+.profile-hero p.lead {
+   margin-top: -0.6rem;
+   margin-bottom: 1rem; /* mantener separación con la tarjeta */
+}
+
+@media (max-width: 768px) {
+   .profile-hero p.lead { margin-top: -0.3rem; }
+}
+
+@media (max-width: 768px) {
+   .profile-hero .hero-title { margin-top: -0.6rem; }
+}
+
+/* Titulares y texto más grandes dentro de la tarjeta */
+.profile-card h2 {
+   font-size: clamp(1.6rem, 2.8vw, 2.6rem);
+   margin-bottom: 0.35rem;
+}
+.profile-card p, .profile-card .lead, .profile-card .fs-5 {
+   font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+}
+
+/* Línea de usuario más grande y ligera */
+.profile-card .text-muted {
+   font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+}
+
+@media (max-width: 480px) {
+   .profile-hero .hero-title { font-size: 2rem; }
+   .profile-card h2 { font-size: 1.25rem; }
+}
+
+/* Estrellas de valoración */
+.rating .star {
+   font-size: 1.25rem;
+   color: rgba(255,255,255,0.35);
+   margin-right: 0.15rem;
+}
+.rating .star.filled {
+   color: #ffd055; /* gold */
+}
+
+.interests-list { color: #eef2ff; }
+
+/* Botón 'Volver' dentro de la tarjeta */
+.profile-card .back-btn {
+   position: absolute;
+   top: 2rem; /* bajado */
+   right: 2.5rem; /* desplazado a la derecha */
+   left: auto;
+   z-index: 3;
+   /* estilo visual: texto blanco en fondo aqua */
+   color: #ffffff;
+   background-color: #2dd4bf; /* aqua */
+   border: none;
+   padding: 0.59rem 2rem;
+   font-size: 1.55rem;
+   font-weight: 300; /* ligero */
+   border-radius: 999px; /* pill */
+   box-shadow: 0 6px 18px rgba(16,24,40,0.12);
+   transition: transform .12s ease, filter .12s ease;
+}
+.profile-card .back-btn:hover {
+   transform: translateY(-2px);
+   filter: brightness(0.94);
+}
+
+/* Botón 'Cargar foto': estilo igual que .back-btn, inline y un poco más abajo */
+.profile-card .photo-btn {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   gap: 0.4rem;
+   color: #ffffff;
+   background-color: #2dd4bf; /* mismo aqua */
+   border: none;
+   padding: 0.59rem 2rem; /* mismo padding */
+   font-size: 1.55rem; /* mismo tamaño */
+   font-weight: 300;
+   border-radius: 999px;
+   box-shadow: 0 6px 18px rgba(16,24,40,0.12);
+   transition: transform .12s ease, filter .12s ease;
+   margin-top: 0.6rem; /* un poco más abajo */
+}
+.profile-card .photo-btn:hover {
+   transform: translateY(-2px);
+   filter: brightness(0.94);
+}
+.profile-card .photo-btn input[type="file"] { display: none; }
+
+/* Labels blancos, valores oscuros */
+.profile-card strong {
+   color: #ffffff;
+   font-weight: 500;
+}
+.profile-card .value {
+   color: #0f172a; /* casi negro */
+   font-weight: 400;
+}
+
+@media (max-width: 768px) {
+   /* en móvil centrar título */
+   .profile-hero .hero-title {
+      text-align: center;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      width: calc(100% - 2rem);
+      max-width: none;
+   }
+}
+
+/* Avatar: más grande y redondo */
+.profile-card .avatar img {
+   width: 170px;
+   height: 170px;
+   object-fit: cover;
+   border-radius: 50%;
+   border: 6px solid #fff;
+   box-shadow: 0 16px 48px rgba(2,6,23,0.5);
+}
+
+@media (max-width: 1024px) {
+   .profile-card .avatar img {
+      width: 150px;
+      height: 150px;
+   }
+}
+
+@media (max-width: 480px) {
+   .profile-card .avatar img {
+      width: 110px;
+      height: 110px;
+   }
+}
+
+/* Hover: agrandar avatar ligeramente */
+.profile-card .avatar img {
+   transition: transform .18s ease, box-shadow .18s ease;
+   transform-origin: center center;
+}
+.profile-card .avatar img:hover {
+   transform: scale(1.07);
+   box-shadow: 0 20px 60px rgba(2,6,23,0.55);
 }
