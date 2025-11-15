@@ -15,16 +15,37 @@
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/" fragment="featured-trips">Viajes</a>
                 </li>
-                <li class="nav-item ms-lg-2">
-                    <a class="btn btn-primary btn-sm" routerLink="/login">
-                        Login
-                    </a>
-                </li>
-                <li class="nav-item ms-lg-2">
-                    <a class="btn btn-primary btn-sm" routerLink="/register">
-                        Registro
-                    </a>
-                </li>
+                
+                @if (isAuthenticated) {
+                    <!-- Usuario autenticado: Mostrar nombre y botón de cerrar sesión -->
+                    <li class="nav-item ms-lg-2">
+                        <span class="navbar-text me-2 text-white">
+                            <i class="bi bi-person-circle"></i> {{ userName }}
+                        </span>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-outline-light btn-sm" routerLink="/viajes">
+                            Mis Viajes
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <button class="btn btn-danger btn-sm" (click)="logout()">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        </button>
+                    </li>
+                } @else {
+                    <!-- Usuario no autenticado: Mostrar botones de login y registro -->
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-primary btn-sm" routerLink="/login">
+                            Login
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-primary btn-sm" routerLink="/register">
+                            Registro
+                        </a>
+                    </li>
+                }
             </ul>
         </div>
     </div>
