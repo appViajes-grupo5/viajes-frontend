@@ -1,1 +1,68 @@
-<p>user-profile works!</p>
+<div class="page-container py-5">
+    <div class="container">
+        <div class="row g-4">
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 rounded-lg text-center p-4 h-100">
+                    <div class="profile-img-container mx-auto mb-3">
+                        <img src="assets/images/profile-placeholder.jpg" alt="Foto de perfil" class="img-fluid rounded-circle profile-img shadow-sm">
+                        <button class="btn btn-sm btn-primary btn-edit-photo rounded-circle">
+                            <i class="bi bi-camera-fill"></i>
+                        </button>
+                    </div>
+                    <h4 class="fw-bold mb-1">Laura García</h4>
+                    <p class="text-muted mb-3">Viajera Entusiasta</p>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary">Ver perfil público</button>
+                        <button class="btn btn-danger bg-opacity-10 text-danger border-0">Cerrar Sesión</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-lg h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0 fw-bold text-primary">Editar Información Personal</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label text-muted small fw-bold">NOMBRE</label>
+                                    <input type="text" class="form-control" id="firstName" formControlName="firstName">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label text-muted small fw-bold">APELLIDOS</label>
+                                    <input type="text" class="form-control" id="lastName" formControlName="lastName">
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="email" class="form-label text-muted small fw-bold">EMAIL</label>
+                                    <input type="email" class="form-control bg-light" id="email" formControlName="email" readonly>
+                                    <div class="form-text">Para cambiar tu email, contacta con soporte.</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="interests" class="form-label text-muted small fw-bold">MIS INTERESES DE VIAJE</label>
+                                    <textarea class="form-control" id="interests" rows="4" formControlName="interests" placeholder="Ej: Senderismo, Gastronomía, Museos..."></textarea>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-light text-muted">Cancelar</button>
+                                <button type="submit" class="btn btn-primary px-4" [disabled]="profileForm.invalid || profileForm.pristine">
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
