@@ -11,6 +11,13 @@
 
             <h2 class="text-center mb-4 fw-bold">Crea tu cuenta</h2>
 
+            <!-- Mensaje de error -->
+            @if (errorMessage) {
+              <div class="alert alert-danger" role="alert">
+                {{ errorMessage }}
+              </div>
+            }
+
             <!-- Tu formulario reactivo (este código ya lo tenías) -->
             <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
@@ -19,7 +26,8 @@
                 <label for="registerName" class="form-label">Nombre</label>
                 <input type="text" class="form-control" id="registerName"
                        formControlName="registerName"
-                       [class.is-invalid]="name?.invalid && name?.touched">
+                       [class.is-invalid]="name?.invalid && name?.touched"
+                       [disabled]="isLoading">
                 @if (name?.errors?.['required'] && name?.touched) {
                   <div class="invalid-feedback">Por favor, introduce tu nombre.</div>
                 }
@@ -30,7 +38,8 @@
                 <label for="registerEmail" class="form-label">Email</label>
                 <input type="email" class="form-control" id="registerEmail"
                        formControlName="registerEmail"
-                       [class.is-invalid]="email?.invalid && email?.touched">
+                       [class.is-invalid]="email?.invalid && email?.touched"
+                       [disabled]="isLoading">
                 @if (email?.errors?.['required'] && email?.touched) {
                   <div class="invalid-feedback">Por favor, introduce un email.</div>
                 } @else if (email?.errors?.['email'] && email?.touched) {
@@ -44,7 +53,8 @@
                 <input [type]="showPassword ? 'text' : 'password'" class="form-control"
                        id="registerPassword"
                        formControlName="registerPassword"
-                       [class.is-invalid]="password?.invalid && password?.touched">
+                       [class.is-invalid]="password?.invalid && password?.touched"
+                       [disabled]="isLoading">
                 @if (password?.errors?.['required'] && password?.touched) {
                   <div class="invalid-feedback">Por favor, introduce tu contraseña.</div>
                 } @else if (password?.errors?.['minlength'] && password?.touched) {
@@ -58,7 +68,8 @@
                 <input [type]="showPassword ? 'text' : 'password'" class="form-control"
                        id="registerPasswordConfirm"
                        formControlName="registerPasswordConfirm"
-                       [class.is-invalid]="(passwordConfirm?.invalid || registerForm.errors?.['passwordsDoNotMatch']) && passwordConfirm?.touched">
+                       [class.is-invalid]="(passwordConfirm?.invalid || registerForm.errors?.['passwordsDoNotMatch']) && passwordConfirm?.touched"
+                       [disabled]="isLoading">
                 @if (passwordConfirm?.errors?.['required'] && passwordConfirm?.touched) {
                   <div class="invalid-feedback">Por favor, confirma tu contraseña.</div>
                 }
@@ -74,8 +85,14 @@
               </div>
 
               <!-- Botón (será verde gracias a src/styles.css) -->
-              <button type="submit" class="btn btn-primary w-100 btn-lg mt-3" [disabled]="registerForm.invalid">
-                Registrarse
+              <button type="submit" class="btn btn-primary w-100 btn-lg mt-3" 
+                      [disabled]="registerForm.invalid || isLoading">
+                @if (isLoading) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Registrando...
+                } @else {
+                  Registrarse
+                }
               </button>
             </form>
 
