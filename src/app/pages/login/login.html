@@ -10,12 +10,20 @@
 
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
+              <!-- Mensaje de error -->
+              @if (errorMessage) {
+                <div class="alert alert-danger" role="alert">
+                  {{ errorMessage }}
+                </div>
+              }
+
               <!-- Campo Email -->
               <div class="mb-3">
                 <label for="loginEmail" class="form-label">Email</label>
                 <input type="email" class="form-control" id="loginEmail"
                        formControlName="loginEmail"
-                       [class.is-invalid]="email?.invalid && email?.touched">
+                       [class.is-invalid]="email?.invalid && email?.touched"
+                       [disabled]="isLoading">
 
                 @if (email?.errors?.['required'] && email?.touched) {
                   <div class="invalid-feedback">
@@ -33,7 +41,8 @@
                 <label for="loginPassword" class="form-label">Contraseña</label>
                 <input type="password" class="form-control" id="loginPassword"
                        formControlName="loginPassword"
-                       [class.is-invalid]="password?.invalid && password?.touched">
+                       [class.is-invalid]="password?.invalid && password?.touched"
+                       [disabled]="isLoading">
 
                 @if (password?.errors?.['required'] && password?.touched) {
                   <div class="invalid-feedback">
@@ -41,8 +50,14 @@
                   </div>
                 }
               </div>
-              <button type="submit" class="btn btn-primary w-100 btn-lg mt-3" [disabled]="loginForm.invalid">
-                Entrar
+              <button type="submit" class="btn btn-primary w-100 btn-lg mt-3" 
+                      [disabled]="loginForm.invalid || isLoading">
+                @if (isLoading) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Iniciando sesión...
+                } @else {
+                  Entrar
+                }
               </button>
             </form>
 
