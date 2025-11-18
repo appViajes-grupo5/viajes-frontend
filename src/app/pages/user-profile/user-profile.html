@@ -1,68 +1,127 @@
 <div class="page-container py-5">
-    <div class="container">
-        <div class="row g-4">
+  <div class="container">
+    <div class="row g-4">
 
-            <div class="col-lg-4">
-                <div class="card shadow-sm border-0 rounded-lg text-center p-4 h-100">
-                    <div class="profile-img-container mx-auto mb-3">
-                        <img src="assets/images/profile-placeholder.jpg" alt="Foto de perfil" class="img-fluid rounded-circle profile-img shadow-sm">
-                        <button class="btn btn-sm btn-primary btn-edit-photo rounded-circle">
-                            <i class="bi bi-camera-fill"></i>
-                        </button>
-                    </div>
-                    <h4 class="fw-bold mb-1">Laura García</h4>
-                    <p class="text-muted mb-3">Viajera Entusiasta</p>
+      <!-- COLUMNA IZQUIERDA: Tarjeta de Resumen (Datos de la tabla 'users') -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm border-0 rounded-lg text-center p-4 h-100">
 
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary">Ver perfil público</button>
-                        <button class="btn btn-danger bg-opacity-10 text-danger border-0">Cerrar Sesión</button>
-                    </div>
+          <!-- CAMPO: profile_picture_url -->
+          <div class="profile-img-container mx-auto mb-3">
+            <img
+              [src]="avatarDataUrl || defaultAvatarUrl"
+              alt="Foto de perfil"
+              class="img-fluid rounded-circle profile-img shadow-sm"
+              onerror="this.src='assets/images/happy.jpg'">
+
+            <button type="button" class="btn btn-sm btn-primary btn-edit-photo rounded-circle"
+                    title="Cambiar foto"
+                    onclick="document.getElementById('fileInput').click()">
+              <i class="bi bi-camera-fill"></i>
+            </button>
+            <input type="file" id="fileInput" (change)="onFileSelected($event)" style="display: none;" accept="image/*">
+          </div>
+
+          <!-- CAMPO: first_name y last_name -->
+          <h4 class="fw-bold mb-1">
+            {{ profileForm.get('firstName')?.value }} {{ profileForm.get('lastName')?.value }}
+          </h4>
+
+          <!-- CAMPO: bio (Vista previa corta) -->
+          <p class="text-muted mb-3 small">
+            {{ (profileForm.get('bio')?.value | slice:0:50) || 'Sin biografía' }}...
+          </p>
+
+          <hr class="my-3">
+
+          <div class="d-flex justify-content-around text-center mb-3">
+            <div>
+              <!-- CAMPO: average_rating (Solo lectura, viene de la BD) -->
+              <h5 class="fw-bold mb-0 text-primary">
+                <i class="bi bi-star-fill text-warning"></i>
+                {{ profileForm.get('averageRating')?.value || '0.00' }}
+              </h5>
+              <small class="text-muted">Valoración</small>
+            </div>
+            <div>
+              <!-- CAMPO: created_at (Solo lectura) -->
+              <h5 class="fw-bold mb-0 text-primary">
+                {{ profileForm.get('createdAt')?.value | date:'yyyy' }}
+              </h5>
+              <small class="text-muted">Miembro desde</small>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-danger border-0">
+              <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA: Formulario de Edición -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-lg h-100">
+          <div class="card-header bg-white border-0 py-3">
+            <h5 class="mb-0 fw-bold text-primary">Editar Información Personal</h5>
+          </div>
+          <div class="card-body p-4">
+
+            <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+              <div class="row g-3">
+
+                <!-- CAMPO: first_name (varchar 100) -->
+                <div class="col-md-6">
+                  <label for="firstName" class="form-label small fw-bold text-muted">NOMBRE</label>
+                  <input type="text" class="form-control" id="firstName" formControlName="firstName">
+                  @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
+                    <div class="text-danger small mt-1">El nombre es obligatorio.</div>
+                  }
+                </div>
+
+                <!-- CAMPO: last_name (varchar 100) -->
+                <div class="col-md-6">
+                  <label for="lastName" class="form-label small fw-bold text-muted">APELLIDOS</label>
+                  <input type="text" class="form-control" id="lastName" formControlName="lastName">
+                </div>
+
+                <!-- CAMPO: email (varchar 255) -->
+                <div class="col-12">
+                  <label for="email" class="form-label small fw-bold text-muted">EMAIL</label>
+                  <!-- Readonly porque cambiar el email suele requerir otro proceso de seguridad -->
+                  <input type="email" class="form-control bg-light" id="email" formControlName="email" readonly>
+                  <div class="form-text">El email no se puede cambiar desde este panel.</div>
+                </div>
+
+                <!-- CAMPO: bio (text) -->
+                <div class="col-12">
+                  <label for="bio" class="form-label small fw-bold text-muted">BIOGRAFÍA</label>
+                  <textarea class="form-control" id="bio" rows="4" formControlName="bio" placeholder="Cuéntanos algo sobre ti..."></textarea>
+                  <div class="form-text text-end">{{ profileForm.get('bio')?.value?.length || 0 }}/500 caracteres</div>
                 </div>
             </div>
 
-            <div class="col-lg-8">
-                <div class="card shadow-sm border-0 rounded-lg h-100">
-                    <div class="card-header bg-white border-0 py-3">
-                        <h5 class="mb-0 fw-bold text-primary">Editar Información Personal</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="firstName" class="form-label text-muted small fw-bold">NOMBRE</label>
-                                    <input type="text" class="form-control" id="firstName" formControlName="firstName">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="lastName" class="form-label text-muted small fw-bold">APELLIDOS</label>
-                                    <input type="text" class="form-control" id="lastName" formControlName="lastName">
-                                </div>
-
-                                <div class="col-12">
-                                    <label for="email" class="form-label text-muted small fw-bold">EMAIL</label>
-                                    <input type="email" class="form-control bg-light" id="email" formControlName="email" readonly>
-                                    <div class="form-text">Para cambiar tu email, contacta con soporte.</div>
-                                </div>
-
-                                <div class="col-12">
-                                    <label for="interests" class="form-label text-muted small fw-bold">MIS INTERESES DE VIAJE</label>
-                                    <textarea class="form-control" id="interests" rows="4" formControlName="interests" placeholder="Ej: Senderismo, Gastronomía, Museos..."></textarea>
-                                </div>
-                            </div>
-
-                            <hr class="my-4">
-
-                            <div class="d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-light text-muted">Cancelar</button>
-                                <button type="submit" class="btn btn-primary px-4" [disabled]="profileForm.invalid || profileForm.pristine">
-                                    Guardar Cambios
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                <!-- CAMPO: interests (text) -->
+                <div class="col-12">
+                  <label for="interests" class="form-label small fw-bold text-muted">INTERESES DE VIAJE</label>
+                  <textarea class="form-control" id="interests" rows="3" formControlName="interests" placeholder="Ej: Senderismo, Gastronomía, Museos..."></textarea>
                 </div>
-            </div>
 
+          
+
+              <hr class="my-4">
+
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-light text-muted" (click)="goBack()">Cancelar</button>
+                <button type="submit" class="btn btn-primary px-4" [disabled]="profileForm.invalid || profileForm.pristine">
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+
+          </div>
         </div>
     </div>
+  </div>
 </div>
