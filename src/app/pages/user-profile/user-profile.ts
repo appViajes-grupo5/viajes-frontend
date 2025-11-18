@@ -1,113 +1,97 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule, SlicePipe } from '@angular/common'; // Importar SlicePipe y CommonModule
+import { CommonModule, DatePipe, SlicePipe, Location } from '@angular/common';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  // Importamos ReactiveFormsModule para [formGroup]
-  // Importamos CommonModule para poder usar @if, [class], etc.
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, DatePipe, SlicePipe],
   templateUrl: './user-profile.html',
-  styleUrls: ['./user-profile.css'],
+  styleUrls: ['./user-profile.css']
 })
 export class UserProfileComponent implements OnInit {
 
-  // Usamos '!' para asegurar a TypeScript que lo inicializaremos
+  // Usamos '!' para indicar que se inicializará en ngOnInit
   profileForm!: FormGroup;
 
-  // Inyectamos el FormBuilder (fb) para crear el formulario
-  constructor(private fb: FormBuilder) {}
-
-  ngOnInit(): void {
-    // Creamos el formulario reactivo
-    this.profileForm = this.fb.group({
-      // Mapeamos los campos de la base de datos a controles
-
-      // CAMPO: first_name
-      firstName: ['Laura', [Validators.required, Validators.maxLength(100)]],
-
-      // CAMPO: last_name
-      lastName: ['García', [Validators.required, Validators.maxLength(100)]],
-
-      // CAMPO: email
-      email: ['laura.garcia@email.com', [Validators.required, Validators.email, Validators.maxLength(255)]],
-
-      // CAMPO: bio
-      bio: ['Me encanta el senderismo, probar comida local y visitar museos de historia.', [Validators.maxLength(5000)]], // 5000 es un límite de ejemplo para 'text'
-
-      // CAMPO: interests
-      interests: ['Senderismo, Gastronomía, Museos', [Validators.maxLength(5000)]]
-
-      // NOTA: profile_picture_url se manejaría por separado con un servicio de subida de archivos.
-      // NOTA: password_hash NO se edita aquí.
-    });
-
-    // En un futuro real, aquí harías una llamada API
-    // this.userService.getProfile().subscribe(data => {
-    //   this.profileForm.patchValue(data);
-    // });
-  }
-
-  // Método que se llama al enviar el formulario
-  onSubmit(): void {
-    // Comprobamos si el formulario es válido
-    if (this.profileForm.valid) {
-
-      console.log('Datos del perfil para guardar:', this.profileForm.value);
-
-      // Aquí es donde llamarías a tu API para guardar los datos
-      // this.userService.updateProfile(this.profileForm.value).subscribe(...)
-
-      // Mostramos una alerta simple (idealmente sería un "toast")
-      alert('¡Perfil actualizado con éxito!');
-
-      // Marcamos el formulario como "pristine" (no modificado)
-      // para que el botón "Guardar" se deshabilite de nuevo.
-      this.profileForm.markAsPristine();
-    } else {
-      // Si el formulario no es válido (ej. email incorrecto), marcamos todos los campos
-      // como "tocados" para que se muestren todos los mensajes de error.
-      this.profileForm.markAllAsTouched();
-    }
-  }
-export class UserProfileComponent {
-  // Datos de ejemplo; en producción llegan desde el backend
-  user = {
-    username: 'maria_g',
-    name: 'María José',
-    apellidos: 'García López',
-    interests: ['Viajes', 'Fotografía', 'Gastronomía'],
-    bio: 'Apasionada viajera y fotógrafa aficionada. Me encanta descubrir culturas y probar platos locales.',
-    rating: 4,
-    email: 'maria.josé_garcia@example.com',
-    phone: '+34 612 987 654',
-  };
-
-  // URL por defecto y dato cargado desde input file
-  // Foto por defecto (randomuser)
-  defaultAvatarUrl = 'https://randomuser.me/api/portraits/women/44.jpg';
+  // Variables para la gestión de la imagen de perfil
+  defaultAvatarUrl = 'assets/images/profile-placeholder.jpg';
   avatarDataUrl: string | null = null;
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-    const file = input.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.avatarDataUrl = reader.result as string;
-    };
-    reader.readAsDataURL(file);
+  constructor(
+    private fb: FormBuilder,
+    private location: Location
+  ) {}
+
+  ngOnInit(): void {
+    // Inicializamos el formulario mapeando la tabla 'users'
+    this.profileForm = this.fb.group({
+      // Campos editables
+      firstName: ['', [Validators.required, Validators.maxLength(100)]], // varchar(100)
+      lastName: ['', [Validators.maxLength(100)]],                       // varchar(100)
+      email: ['', [Validators.required, Validators.email]],               // varchar(255) - readonly
+      bio: ['', [Validators.maxLength(500)]],                             // text
+      interests: [''],                                                    // text
+
+      // Campos de solo lectura (para mostrar en la UI)
+      profilePictureUrl: [null],                                          // varchar(255)
+      averageRating: [0],                                                 // decimal(3,2)
+      createdAt: [new Date()]                                             // timestamp
+    });
+
+    this.loadUserData();
   }
 
-  // Volver en el historial; sencillo para evitar inyectar Location
-  goBack(): void {
-    try {
-      window.history.back();
-    } catch (e) {
-  // fallback: ninguno
+  loadUserData() {
+    // SIMULACIÓN: Datos que vendrían de un SELECT * FROM users WHERE user_id = X
+    const mockUserData = {
+      firstName: 'Carlos',
+      lastName: 'Fernández',
+      email: 'carlos.viajero@example.com',
+      bio: 'Me apasiona la fotografía de paisajes y descubrir la gastronomía local de cada pueblo.',
+      interests: 'Senderismo, Fotografía, Cocina Italiana',
+      averageRating: 4.9,
+      createdAt: new Date('2024-02-10'),
+      profilePictureUrl: 'https://i.pravatar.cc/150?img=11' // Ejemplo de URL
+    };
+
+    // Cargamos los datos en el formulario
+    this.profileForm.patchValue(mockUserData);
+
+    // Actualizamos la vista previa de la foto si existe
+    if (mockUserData.profilePictureUrl) {
+        this.avatarDataUrl = mockUserData.profilePictureUrl;
     }
   }
 
+  goBack(): void {
+    this.location.back();
+  }
 
+  onSubmit(): void {
+    if (this.profileForm.valid) {
+      // Aquí enviarías el objeto 'this.profileForm.value' a tu API
+      // para hacer el UPDATE en la base de datos.
+      console.log('Datos listos para UPDATE en BD:', this.profileForm.value);
+
+      // Marcamos el formulario como "no modificado" tras guardar
+      this.profileForm.markAsPristine();
+      alert('Perfil actualizado con éxito'); // Feedback simple
+    } else {
+        // Si hay errores, marcamos los campos para mostrar mensajes
+        this.profileForm.markAllAsTouched();
+    }
+  }
+
+  // Método para previsualizar imagen seleccionada (sin subirla todavía)
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.avatarDataUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 }
