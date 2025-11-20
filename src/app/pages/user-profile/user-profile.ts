@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe, SlicePipe, Location } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -10,58 +12,71 @@ import { CommonModule, DatePipe, SlicePipe, Location } from '@angular/common';
   styleUrls: ['./user-profile.css']
 })
 export class UserProfileComponent implements OnInit {
-
-  // Usamos '!' para indicar que se inicializará en ngOnInit
   profileForm!: FormGroup;
-
-  // Variables para la gestión de la imagen de perfil
   defaultAvatarUrl = 'assets/images/profile-placeholder.jpg';
-  avatarDataUrl: string | null = null;
+  avatarPreviewUrl: string | null = null; // Para vista previa temporal
+  isLoading: boolean = false;
+  isSaving: boolean = false;
+  errorMessage: string = '';
+  successMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private location: Location
+    private location: Location,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    // Inicializamos el formulario mapeando la tabla 'users'
     this.profileForm = this.fb.group({
-      // Campos editables
-      firstName: ['', [Validators.required, Validators.maxLength(100)]], // varchar(100)
-      lastName: ['', [Validators.maxLength(100)]],                       // varchar(100)
-      email: ['', [Validators.required, Validators.email]],               // varchar(255) - readonly
-      bio: ['', [Validators.maxLength(500)]],                             // text
-      interests: [''],                                                    // text
-
-      // Campos de solo lectura (para mostrar en la UI)
-      profilePictureUrl: [null],                                          // varchar(255)
-      averageRating: [0],                                                 // decimal(3,2)
-      createdAt: [new Date()]                                             // timestamp
+      // Campos editables según la BD: first_name, last_name, phone, bio, interests, profile_picture_url
+      firstName: ['', [Validators.required, Validators.maxLength(100)]],
+      lastName: ['', [Validators.maxLength(100)]],
+      phone: ['', [Validators.maxLength(25)]],
+      bio: ['', [Validators.maxLength(500)]],
+      interests: [''],
+      profilePictureUrl: [null],
+      // Campos de solo lectura (no editables): email, average_rating, created_at
+      email: ['', [Validators.required, Validators.email]],
+      averageRating: [0],
+      createdAt: [new Date()]
     });
 
     this.loadUserData();
   }
 
-  loadUserData() {
-    // SIMULACIÓN: Datos que vendrían de un SELECT * FROM users WHERE user_id = X
-    const mockUserData = {
-      firstName: 'Carlos',
-      lastName: 'Fernández',
-      email: 'carlos.viajero@example.com',
-      bio: 'Me apasiona la fotografía de paisajes y descubrir la gastronomía local de cada pueblo.',
-      interests: 'Senderismo, Fotografía, Cocina Italiana',
-      averageRating: 4.9,
-      createdAt: new Date('2024-02-10'),
-      profilePictureUrl: 'https://i.pravatar.cc/150?img=11' // Ejemplo de URL
-    };
+  loadUserData(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
 
-    // Cargamos los datos en el formulario
-    this.profileForm.patchValue(mockUserData);
+    this.authService.getCurrentUserFromApi().subscribe({
+      next: (userData) => {
+        this.isLoading = false;
+        
+        // Cargar datos en el formulario
+        this.profileForm.patchValue({
+          firstName: userData.firstName || '',
+          lastName: userData.lastName || '',
+          phone: userData.phone || '',
+          bio: userData.bio || '',
+          interests: userData.interests || '',
+          profilePictureUrl: userData.profilePictureUrl || null,
+          email: userData.email || '',
+          averageRating: userData.averageRating || 0,
+          createdAt: userData.createdAt ? new Date(userData.createdAt) : new Date()
+        });
 
-    // Actualizamos la vista previa de la foto si existe
-    if (mockUserData.profilePictureUrl) {
-        this.avatarDataUrl = mockUserData.profilePictureUrl;
-    }
+        // Actualizar vista previa de foto (si hay URL)
+        if (userData.profilePictureUrl) {
+          this.avatarPreviewUrl = userData.profilePictureUrl;
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error cargando usuario:', error);
+        this.errorMessage = error.error?.error || 'Error al cargar los datos del usuario';
+      }
+    });
   }
 
   goBack(): void {
@@ -69,29 +84,69 @@ export class UserProfileComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.profileForm.valid) {
-      // Aquí enviarías el objeto 'this.profileForm.value' a tu API
-      // para hacer el UPDATE en la base de datos.
-      console.log('Datos listos para UPDATE en BD:', this.profileForm.value);
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
+      return;
+    }
 
-      // Marcamos el formulario como "no modificado" tras guardar
-      this.profileForm.markAsPristine();
-      alert('Perfil actualizado con éxito'); // Feedback simple
-    } else {
-        // Si hay errores, marcamos los campos para mostrar mensajes
-        this.profileForm.markAllAsTouched();
+    this.isSaving = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const formValue = this.profileForm.value;
+    // Solo enviar campos editables: firstName, lastName, phone, bio, interests, profilePictureUrl
+    // profilePictureUrl debe ser una URL, no base64
+    const updateData = {
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      phone: formValue.phone || null,
+      bio: formValue.bio || null,
+      interests: formValue.interests || null,
+      profilePictureUrl: formValue.profilePictureUrl || null // URL, no base64
+    };
+
+    this.authService.updateUser(updateData).subscribe({
+      next: (response) => {
+        this.isSaving = false;
+        this.successMessage = 'Perfil actualizado con éxito';
+        this.profileForm.markAsPristine();
+        
+        // Actualizar datos en el formulario con la respuesta
+        this.profileForm.patchValue({
+          firstName: response.firstName,
+          lastName: response.lastName,
+          phone: response.phone,
+          bio: response.bio,
+          interests: response.interests,
+          profilePictureUrl: response.profilePictureUrl,
+          email: response.email,
+          averageRating: response.averageRating
+        });
+
+        // Ocultar mensaje después de 3 segundos
+        setTimeout(() => {
+          this.successMessage = '';
+        }, 3000);
+      },
+      error: (error) => {
+        this.isSaving = false;
+        console.error('Error actualizando usuario:', error);
+        this.errorMessage = error.error?.error || 'Error al actualizar el perfil';
+      }
+    });
+  }
+
+  // Método para actualizar la vista previa cuando cambia la URL
+  onUrlChange(): void {
+    const url = this.profileForm.get('profilePictureUrl')?.value;
+    if (url) {
+      this.avatarPreviewUrl = url;
+      this.profileForm.markAsDirty();
     }
   }
 
-  // Método para previsualizar imagen seleccionada (sin subirla todavía)
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.avatarDataUrl = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }
