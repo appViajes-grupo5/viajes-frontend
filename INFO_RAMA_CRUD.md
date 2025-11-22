@@ -9,7 +9,7 @@
 
 ## 📦 1. Resumen Técnico y Arquitectura
 
-Esta feature implementa el sistema completo de gestión de viajes. Se ha seguido una arquitectura modular basada en **Angular 18+ (Standalone)**.
+Esta feature implementa el sistema completo de gestión de viajes. Se ha seguido una arquitectura modular.
 
 ### 📂 Estructura de Nuevos Archivos
 ```text
