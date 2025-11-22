@@ -1,13 +1,6 @@
 .page-container {
-  /* Fondo gris muy claro */
   background-color: #f8f9fa;
-
-  /* Calcula la altura de la pantalla (100vh) y resta
-    la altura de tu header (aprox. 66px) y tu
-    footer (aprox. 58px).
-
-    Usamos 'min-height' para que si el formulario
-    es muy largo (en un móvil), la página crezca.
-  */
-  min-height: calc(100vh - 66px - 58px);
+  padding-top: 90px;
+  padding-bottom: 40px;
+  min-height: calc(100vh - 90px);
 }

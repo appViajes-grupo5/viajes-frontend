@@ -1,52 +1,81 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-transparent fixed-top" id="mainNavbar">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar" [class.navbar-scrolled]="isScrolled">
     <div class="container">
-        <a class="navbar-brand fw-bold" routerLink="/">
-            <i class="bi bi-compass-fill"></i>
-            TravelConnect
+        <!-- Brand -->
+        <a class="navbar-brand fw-bold d-flex align-items-center" routerLink="/">
+            <i class="bi bi-compass-fill me-2"></i>
+            <span>TravelConnect</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+        <!-- Toggle button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+
+        <!-- Navbar content -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/" fragment="how-it-works">Cómo funciona</a>
+                    <a class="nav-link" routerLink="/" fragment="how-it-works">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Cómo funciona
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/" fragment="featured-trips">Viajes</a>
+                    <a class="nav-link" routerLink="/viajes">
+                        <i class="bi bi-airplane me-1"></i>
+                        Viajes
+                    </a>
                 </li>
-                
-                @if (isAuthenticated) {
-                    <!-- Usuario autenticado: Mostrar nombre y botón de cerrar sesión -->
-                    <li class="nav-item ms-lg-2">
-                        <span class="navbar-text me-2 text-white">
-                            <i class="bi bi-person-circle"></i> {{ userName }}
-                        </span>
-                    </li>
-                    <li class="nav-item ms-lg-2">
-                        <a class="btn btn-outline-light btn-sm" routerLink="/viajes">
-                            Mis Viajes
-                        </a>
-                    </li>
-                    <li class="nav-item ms-lg-2">
-                        <button class="btn btn-danger btn-sm" (click)="logout()">
-                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-                        </button>
-                    </li>
-                } @else {
-                    <!-- Usuario no autenticado: Mostrar botones de login y registro -->
-                    <li class="nav-item ms-lg-2">
-                        <a class="btn btn-primary btn-sm" routerLink="/login">
-                            Login
-                        </a>
-                    </li>
-                    <li class="nav-item ms-lg-2">
-                        <a class="btn btn-primary btn-sm" routerLink="/register">
-                            Registro
-                        </a>
-                    </li>
-                }
             </ul>
+
+            <!-- Right side: Auth buttons or user menu -->
+            <div class="d-flex align-items-center gap-2">
+                @if (isAuthenticated) {
+                    <!-- Usuario autenticado -->
+                    <div class="dropdown">
+                        <button class="btn btn-link text-white text-decoration-none dropdown-toggle d-flex align-items-center" 
+                                type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-2 fs-5"></i>
+                            <span class="d-none d-md-inline">{{ userName }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                            <li>
+                                <h6 class="dropdown-header">
+                                    <i class="bi bi-person me-2"></i>{{ userName }}
+                                </h6>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" routerLink="/viajes">
+                                    <i class="bi bi-airplane me-2"></i>Mis Viajes
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" routerLink="/perfil">
+                                    <i class="bi bi-person-gear me-2"></i>Mi Perfil
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <button class="dropdown-item text-danger" (click)="logout()">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                } @else {
+                    <!-- Usuario no autenticado -->
+                    <a class="btn btn-outline-light btn-sm" routerLink="/login">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>
+                        Iniciar Sesión
+                    </a>
+                    <a class="btn btn-primary btn-sm" routerLink="/register">
+                        <i class="bi bi-person-plus me-1"></i>
+                        Registrarse
+                    </a>
+                }
+            </div>
         </div>
     </div>
 </nav>

@@ -52,3 +52,14 @@ app-root {
 app-footer {
     margin-top: auto;
 }
+
+/* Espaciado para el navbar fijo en todas las páginas */
+.page-container {
+    padding-top: 90px !important;
+    min-height: calc(100vh - 90px);
+}
+
+/* Ajuste específico para el home (hero section) - el hero ya tiene su propio padding */
+.hero-section {
+    padding-top: 80px;
+}

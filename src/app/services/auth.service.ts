@@ -101,5 +101,51 @@ export class AuthService {
     }
     return null;
   }
+
+  getCurrentUserFromApi(): Observable<any> {
+    const token = this.getToken();
+    if (!token) {
+      throw new Error('No hay token disponible');
+    }
+
+    const apiUrl = environment.apiUrl;
+    return this.http.get<any>(`${apiUrl}/users/me`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
+
+  updateUser(userData: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    bio?: string;
+    interests?: string;
+    profilePictureUrl?: string;
+  }): Observable<any> {
+    const token = this.getToken();
+    if (!token) {
+      throw new Error('No hay token disponible');
+    }
+
+    const apiUrl = environment.apiUrl;
+    return this.http.put<any>(`${apiUrl}/users/me`, userData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).pipe(
+      tap(response => {
+        // Actualizar el usuario en localStorage y observable
+        const updatedUser = {
+          id: response.id,
+          name: `${response.firstName} ${response.lastName || ''}`.trim(),
+          email: response.email
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        this.currentUserSubject.next(updatedUser);
+      })
+    );
+  }
 }
 
