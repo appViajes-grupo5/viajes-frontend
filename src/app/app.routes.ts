@@ -6,8 +6,9 @@ import { RegisterComponent } from './pages/register/register';
 import { TripListComponent } from './pages/trip-list/trip-list';
 import { TripDetailComponent } from './pages/trip-detail/trip-detail';
 import { UserProfileComponent } from './pages/user-profile/user-profile';
-
 import { authGuard } from './context-guards/auth.guard';
+import { TripFormComponent } from './pages/trip-form/trip-form';
+
 
 export const routes: Routes = [
   {
@@ -37,7 +38,19 @@ export const routes: Routes = [
     component: UserProfileComponent,
     canActivate: [authGuard],
   },
+
   {
+    path: 'crear-viaje',
+    component: TripFormComponent,
+    canActivate: [authGuard],
+
+  },
+  {
+    path: 'editar-viaje/:id',
+    component: TripFormComponent,
+    canActivate: [authGuard],
+  },
+ {
     path: '**',
     redirectTo: '',
     pathMatch: 'full',
