@@ -1,0 +1,65 @@
+<div class="container py-5">
+  <div class="card shadow-sm p-4 border-0">
+    <h2 class="fw-bold mb-4">{{ isEditMode ? 'Editar Viaje' : 'Crear Nuevo Viaje' }}</h2>
+
+    <form [formGroup]="tripForm" (ngSubmit)="onSubmit()">
+
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label fw-bold">Título del Viaje</label>
+          <input type="text" class="form-control" formControlName="title">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Destino</label>
+          <input type="text" class="form-control" formControlName="destination">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Coste (€)</label>
+          <input type="number" class="form-control" formControlName="estimated_cost">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Min. Personas</label>
+          <input type="number" class="form-control" formControlName="min_participants">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Fecha Inicio</label>
+          <input type="date" class="form-control" formControlName="start_date">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Fecha Fin</label>
+          <input type="date" class="form-control" formControlName="end_date">
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-bold">Descripción</label>
+          <textarea class="form-control" rows="3" formControlName="description"></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">Itinerario</label>
+          <textarea class="form-control" rows="4" formControlName="itinerary"></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">Transporte</label>
+          <input type="text" class="form-control" formControlName="transport_details">
+        </div>
+
+        <div class="col-12">
+            <label class="form-label fw-bold">URL de la Imagen</label>
+            <input type="text" class="form-control" formControlName="image_url" placeholder="https://...">
+            <div class="form-text text-muted">Pega aquí el enlace de una foto de internet (Google Images, Unsplash, etc).</div>
+        </div>
+
+      </div>
+
+      <div class="d-flex gap-2 mt-4 justify-content-end">
+        <button type="button" class="btn btn-light" (click)="goBack()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="tripForm.invalid">
+          {{ isEditMode ? 'Guardar Cambios' : 'Publicar Viaje' }}
+        </button>
+      </div>
+
+    </form>
+    </div>
+</div>
