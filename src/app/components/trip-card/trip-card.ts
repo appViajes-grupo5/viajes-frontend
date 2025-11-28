@@ -2,6 +2,7 @@ import { Component, input } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router'; // Para poder navegar al detalle
 import { Trip } from '../../models/trip.interface';
+import { getTripImageUrl } from '../../utils/trip-image.util';
 
 @Component({
   selector: 'app-trip-card',
@@ -29,4 +30,9 @@ export class TripCardComponent {
   // Input obligatorio (Signal).
   // En el HTML accederemos a él como trip() (con paréntesis)
   trip = input.required<Trip>();
+
+  // Método para obtener imagen dinámica
+  getImageUrl(): string {
+    return getTripImageUrl(this.trip());
+  }
 }
