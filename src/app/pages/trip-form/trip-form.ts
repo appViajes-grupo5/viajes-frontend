@@ -40,37 +40,49 @@ export class TripFormComponent implements OnInit {
     if (id) {
       this.isEditMode = true;
       this.tripId = Number(id);
-      const tripToEdit: Trip | undefined = this.tripService.getTripById(this.tripId);
+      this.tripService.getTripById(this.tripId).subscribe({
+        next: (tripToEdit) => {
+          if (tripToEdit) {
+            this.tripForm.patchValue({
+              ...tripToEdit,
+              start_date: this.formatDate(tripToEdit.start_date),
+              end_date: this.formatDate(tripToEdit.end_date)
+            });
+          }
+        },
+        error: (err) => console.error('Error loading trip', err)
+      });
+    }
+  }
 
-      if (tripToEdit) {
-        this.tripForm.patchValue({
-            ...tripToEdit,
-            start_date: this.formatDate(tripToEdit.start_date),
-            end_date: this.formatDate(tripToEdit.end_date)
+  onSubmit(): void {
+    if (this.tripForm.valid) {
+      const formValues = this.tripForm.value;
+
+      if (this.isEditMode && this.tripId) {
+        this.tripService.updateTrip({ ...formValues, trip_id: this.tripId }).subscribe({
+          next: () => {
+            this.router.navigate(['/viaje', this.tripId]);
+          },
+          error: (err) => console.error('Error updating trip', err)
+        });
+      } else {
+        this.tripService.addTrip(formValues).subscribe({
+          next: (response) => {
+            // El backend devuelve { message: "...", trip_id: ... }
+            const newId = response.trip_id;
+            this.router.navigate(['/viaje', newId]);
+          },
+          error: (err) => console.error('Error creating trip', err)
         });
       }
     }
   }
 
-  onSubmit(): void {
-  if (this.tripForm.valid) {
-    const formValues = this.tripForm.value;
-
-    if (this.isEditMode && this.tripId) {
-      this.tripService.updateTrip({ ...formValues, trip_id: this.tripId });
-      this.router.navigate(['/viaje', this.tripId]);
-    } else {
-
-      const newId = this.tripService.addTrip(formValues);
-      this.router.navigate(['/viaje', newId]);
-    }
-  }
-}
-
   goBack() { this.location.back(); }
 
   private formatDate(date: string | Date): string {
-      const d = new Date(date);
-      return d.toISOString().split('T')[0];
+    const d = new Date(date);
+    return d.toISOString().split('T')[0];
   }
 }
