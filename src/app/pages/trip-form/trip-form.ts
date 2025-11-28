@@ -58,6 +58,8 @@ export class TripFormComponent implements OnInit {
   onSubmit(): void {
     if (this.tripForm.valid) {
       const formValues = this.tripForm.value;
+      // Eliminar image_url ya que la base de datos no tiene esa columna
+      delete formValues.image_url;
 
       if (this.isEditMode && this.tripId) {
         this.tripService.updateTrip({ ...formValues, trip_id: this.tripId }).subscribe({
