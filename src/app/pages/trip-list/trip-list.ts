@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TripService } from '../../services/trip.service';
 import { Trip } from '../../models/trip.interface';
@@ -7,7 +8,7 @@ import { Trip } from '../../models/trip.interface';
 @Component({
   selector: 'app-trip-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './trip-list.html',
   styleUrls: ['./trip-list.css']
 })

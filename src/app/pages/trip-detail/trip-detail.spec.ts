@@ -1,23 +1,71 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TripDetailComponent } from './trip-detail';
+import { TripService } from '../../services/trip.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { of } from 'rxjs';
 
-import { TripDetail } from './trip-detail';
+describe('TripDetailComponent', () => {
+  let component: TripDetailComponent;
+  let fixture: ComponentFixture<TripDetailComponent>;
 
-describe('TripDetail', () => {
-  let component: TripDetail;
-  let fixture: ComponentFixture<TripDetail>;
+  const tripServiceMock = {
+    getTripById: (id: number) => of({
+      trip_id: id,
+      title: 'Test Trip',
+      description: 'Desc',
+      destination: 'Dest',
+      start_date: '2024-01-01',
+      end_date: '2024-01-05',
+      estimated_cost: 100,
+      min_participants: 1,
+      transport_details: 'Bus',
+      itinerary: 'Itinerary',
+      image_url: 'img.jpg'
+    }),
+    joinTrip: (id: number) => { },
+    deleteTrip: (id: number) => { }
+  };
+
+  const activatedRouteMock = {
+    snapshot: {
+      paramMap: {
+        get: (key: string) => '1'
+      }
+    }
+  };
+
+  const routerMock = {
+    navigate: jasmine.createSpy('navigate')
+  };
+
+  const locationMock = {
+    back: jasmine.createSpy('back')
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TripDetail]
+      imports: [TripDetailComponent],
+      providers: [
+        { provide: TripService, useValue: tripServiceMock },
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: Router, useValue: routerMock },
+        { provide: Location, useValue: locationMock }
+      ]
     })
-    .compileComponents();
+      .compileComponents();
 
-    fixture = TestBed.createComponent(TripDetail);
+    fixture = TestBed.createComponent(TripDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should load trip details on init', () => {
+    expect(component.trip).toBeDefined();
+    expect(component.trip?.title).toBe('Test Trip');
   });
 });
