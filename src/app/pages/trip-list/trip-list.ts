@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { TripService } from '../../services/trip.service';
+import { Trip } from '../../models/trip.interface';
 
 @Component({
   selector: 'app-trip-list',
@@ -11,13 +13,26 @@ import { AuthService } from '../../services/auth.service';
 })
 export class TripListComponent implements OnInit {
   userName: string = '';
+  trips: Trip[] = [];
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private tripService: TripService
+  ) { }
 
   ngOnInit(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
       this.userName = user.name;
     }
+
+    this.tripService.getTrips().subscribe({
+      next: (data) => {
+        this.trips = data;
+      },
+      error: (err) => {
+        console.error('Error al obtener viajes', err);
+      }
+    });
   }
 }
