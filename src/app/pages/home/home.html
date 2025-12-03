@@ -13,11 +13,11 @@
 <div class="container py-3 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-primary-tc">Próximas Salidas</h3>
-        <span class="badge bg-primary rounded-pill">{{ tripService.trips().length }} viajes disponibles</span>
+        <span class="badge bg-primary rounded-pill">{{ trips().length }} viajes disponibles</span>
     </div>
 
     <div class="row g-4">
-        @for (tripItem of tripService.trips(); track tripItem.trip_id) {
+        @for (tripItem of trips(); track tripItem.trip_id) {
             <div class="col-md-6 col-lg-4">
                 <app-trip-card [trip]="tripItem"></app-trip-card>
             </div>

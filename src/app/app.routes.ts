@@ -31,7 +31,6 @@ export const routes: Routes = [
   {
     path: 'viaje/:id',
     component: TripDetailComponent,
-    canActivate: [authGuard],
   },
   {
     path: 'perfil',
@@ -50,7 +49,7 @@ export const routes: Routes = [
     component: TripFormComponent,
     canActivate: [authGuard],
   },
- {
+  {
     path: '**',
     redirectTo: '',
     pathMatch: 'full',

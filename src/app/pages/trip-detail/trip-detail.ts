@@ -15,7 +15,7 @@ export class TripDetailComponent implements OnInit {
   // Inyección de dependencias
   private tripService = inject(TripService);
   private route = inject(ActivatedRoute);
-  private router = inject(Router); 
+  private router = inject(Router);
   private location = inject(Location);
 
   trip?: Trip; // Aquí guardamos los datos del viaje
@@ -26,7 +26,16 @@ export class TripDetailComponent implements OnInit {
 
     // 2. Si hay ID, pedimos el viaje al servicio
     if (id) {
-      this.trip = this.tripService.getTripById(id);
+      this.tripService.getTripById(id).subscribe({
+        next: (trip) => {
+          this.trip = trip;
+        },
+        error: (err) => {
+          console.error('Error cargando el viaje', err);
+          // Opcional: redirigir si no existe
+          // this.router.navigate(['/']);
+        }
+      });
     }
   }
 
@@ -45,10 +54,16 @@ export class TripDetailComponent implements OnInit {
 
     if (confirmDelete) {
       // 1. Borramos del servicio
-      this.tripService.deleteTrip(this.trip.trip_id);
-
-      // 2. Redirigimos a la Home (o a /viajes)
-      this.router.navigate(['/']);
+      this.tripService.deleteTrip(this.trip.trip_id).subscribe({
+        next: () => {
+          // 2. Redirigimos a la Home (o a /viajes)
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          console.error('Error eliminando el viaje', err);
+          alert('Hubo un error al eliminar el viaje');
+        }
+      });
     }
   }
 }
