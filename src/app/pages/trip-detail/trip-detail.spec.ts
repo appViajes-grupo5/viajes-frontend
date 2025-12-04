@@ -9,23 +9,21 @@ describe('TripDetailComponent', () => {
   let component: TripDetailComponent;
   let fixture: ComponentFixture<TripDetailComponent>;
 
-  const tripServiceMock = {
-    getTripById: (id: number) => of({
-      trip_id: id,
-      title: 'Test Trip',
-      description: 'Desc',
-      destination: 'Dest',
-      start_date: '2024-01-01',
-      end_date: '2024-01-05',
-      estimated_cost: 100,
-      min_participants: 1,
-      transport_details: 'Bus',
-      itinerary: 'Itinerary',
-      image_url: 'img.jpg'
-    }),
-    joinTrip: (id: number) => { },
-    deleteTrip: (id: number) => of({})
-  };
+  const tripServiceMock = jasmine.createSpyObj('TripService', ['getTripById', 'joinTrip', 'deleteTrip']);
+  tripServiceMock.getTripById.and.returnValue(of({
+    trip_id: 1,
+    title: 'Test Trip',
+    description: 'Desc',
+    destination: 'Dest',
+    start_date: '2024-01-01',
+    end_date: '2024-01-05',
+    estimated_cost: 100,
+    min_participants: 1,
+    transport_details: 'Bus',
+    itinerary: 'Itinerary',
+    image_url: 'img.jpg'
+  }));
+  tripServiceMock.deleteTrip.and.returnValue(of({}));
 
   const activatedRouteMock = {
     snapshot: {
@@ -36,7 +34,9 @@ describe('TripDetailComponent', () => {
   };
 
   const routerMock = {
-    navigate: jasmine.createSpy('navigate')
+    navigate: jasmine.createSpy('navigate'),
+    createUrlTree: jasmine.createSpy('createUrlTree').and.returnValue({}),
+    serializeUrl: jasmine.createSpy('serializeUrl').and.returnValue('')
   };
 
   const locationMock = {
