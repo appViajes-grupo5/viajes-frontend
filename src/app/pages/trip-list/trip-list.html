@@ -30,7 +30,7 @@
             <p class="card-text">
               <strong>Precio:</strong> {{ trip.estimated_cost | currency:'EUR' }}
             </p>
-            <button class="btn btn-primary w-100">Ver Detalles</button>
+            <button [routerLink]="['/viaje', trip.trip_id]" class="btn btn-primary w-100">Ver Detalles</button>
           </div>
         </div>
       </div>

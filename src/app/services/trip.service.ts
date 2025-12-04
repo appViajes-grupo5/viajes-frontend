@@ -44,4 +44,10 @@ export class TripService {
     // Nota: Falta implementar cuando Manuel tenga su parte
     joinTrip(tripId: number): void {
     }
+
+    // Eliminar un viaje
+    // DELETE /api/trips/:id
+    deleteTrip(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
 }

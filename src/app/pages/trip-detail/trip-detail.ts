@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TripService } from '../../services/trip';
+import { TripService } from '../../services/trip.service';
 import { Trip } from '../../models/trip.interface';
 
 @Component({
@@ -42,6 +42,15 @@ export class TripDetailComponent implements OnInit {
   // Volver a la página anterior
   goBack() {
     this.location.back();
+  }
+
+  // Funcionalidad Reservar
+  joinTrip() {
+    if (!this.trip) return;
+
+    // Nota: Falta implemnetar cuando este backend
+    this.tripService.joinTrip(this.trip.trip_id);
+    alert('¡Solicitud enviada! (Falta parte Manuel)');
   }
 
   // Funcionalidad de BORRAR (La D de CRUD)
