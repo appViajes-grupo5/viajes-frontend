@@ -24,7 +24,7 @@ describe('TripDetailComponent', () => {
       image_url: 'img.jpg'
     }),
     joinTrip: (id: number) => { },
-    deleteTrip: (id: number) => { }
+    deleteTrip: (id: number) => of({})
   };
 
   const activatedRouteMock = {

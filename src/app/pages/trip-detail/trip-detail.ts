@@ -27,12 +27,13 @@ export class TripDetailComponent implements OnInit {
     // 2. Si hay ID, pedimos el viaje al servicio
     if (id) {
       this.tripService.getTripById(id).subscribe({
-        next: (data) => {
-          this.trip = data;
+        next: (trip) => {
+          this.trip = trip;
         },
         error: (err) => {
-          console.error('Error al cargar el viaje', err);
-          this.router.navigate(['/']);
+          console.error('Error cargando el viaje', err);
+          // Opcional: redirigir si no existe
+          // this.router.navigate(['/']);
         }
       });
     }
@@ -61,8 +62,17 @@ export class TripDetailComponent implements OnInit {
     const confirmDelete = confirm(`¿Estás seguro de que quieres eliminar "${this.trip.title}"?`);
 
     if (confirmDelete) {
-      console.warn('Delete trip no implementado en servicio HTTP aún');
-
+      // 1. Borramos del servicio
+      this.tripService.deleteTrip(this.trip.trip_id).subscribe({
+        next: () => {
+          // 2. Redirigimos a la Home (o a /viajes)
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          console.error('Error eliminando el viaje', err);
+          alert('Hubo un error al eliminar el viaje');
+        }
+      });
     }
   }
 }
