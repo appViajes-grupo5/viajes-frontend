@@ -2,7 +2,7 @@
 <div class="container py-5">
 
   <button (click)="goBack()" class="btn btn-link text-decoration-none mb-4 ps-0 text-secondary">
-    <i class="bi bi-arrow-left">Volver al listado</i>
+    <i class="bi bi-arrow-left"></i> Volver al listado
   </button>
 
   <div class="row shadow rounded-4 overflow-hidden border bg-white">
@@ -20,10 +20,9 @@
       <h1 class="fw-bold mb-3">{{ trip.title }}</h1>
 
       <div class="d-flex flex-wrap gap-4 text-muted mb-4 small">
-
         <span class="d-flex align-items-center">
           <i class="bi bi-calendar3 me-2 text-primary"></i>
-          {{ trip.start_date | date:'mediumDate' }} - {{ trip.end_date | date:'mediumDate' }}
+          {{ trip.start_date | date:'dd/MM/yyyy' }} - {{ trip.end_date | date:'dd/MM/yyyy' }}
         </span>
 
         <span class="d-flex align-items-center">
@@ -35,31 +34,57 @@
           <i class="bi bi-airplane-engines me-2 text-primary"></i>
           {{ trip.transport_details }}
         </span>
-
       </div>
+
       <h5 class="fw-bold mt-4">Descripción</h5>
       <p class="text-muted lead fs-6">{{ trip.description }}</p>
+
+      @if (participants.length > 0) {
+        <div class="mb-4">
+          <h6 class="fw-bold text-secondary mb-2">Ya se han apuntado:</h6>
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            @for (p of participants; track $index) {
+              <div class="d-flex flex-column align-items-center" style="width: 50px;">
+                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm" 
+                     style="width: 40px; height: 40px; font-size: 1.2rem;" 
+                     [title]="p.firstName">
+                  {{ p.firstName?.charAt(0) | uppercase }}
+                </div>
+                <small class="text-truncate w-100 text-center" style="font-size: 0.7rem;">{{ p.firstName }}</small>
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <hr class="my-4 opacity-10">
 
       <h5 class="fw-bold">Itinerario</h5>
       <p class="small text-muted bg-light p-3 rounded border-start border-3 border-primary">
-        {{ trip.itinerary }}
+        {{ trip.itinerary || 'Itinerario pendiente de confirmar.' }}
       </p>
 
       <div class="mt-4 pt-2 d-flex gap-2 flex-wrap">
-        <button (click)="joinTrip()" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
-          ¡Me apunto!
-        </button>
+        
+        @if (!isJoined) {
+          <button (click)="joinTrip()" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
+            <i class="bi bi-check-lg me-1"></i> ¡Me apunto!
+          </button>
+        } @else {
+          <button (click)="leaveTrip()" class="btn btn-warning px-4 py-2 rounded-pill shadow-sm">
+            <i class="bi bi-x-circle me-1"></i> Cancelar plaza
+          </button>
+        }
 
         <a [routerLink]="['/editar-viaje', trip.trip_id]" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
-          <i class="bi bi-pencil">Editar</i>
+          <i class="bi bi-pencil me-1"></i> Editar
         </a>
 
         <button (click)="deleteTrip()" class="btn btn-outline-danger px-4 py-2 rounded-pill">
-          <i class="bi bi-trash">Borrar</i>
+          <i class="bi bi-trash me-1"></i> Borrar
         </button>
       </div>
+
     </div>
   </div>
 
