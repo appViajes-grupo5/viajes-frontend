@@ -8,6 +8,8 @@ import { TripDetailComponent } from './pages/trip-detail/trip-detail';
 import { UserProfileComponent } from './pages/user-profile/user-profile';
 import { authGuard } from './context-guards/auth.guard';
 import { TripFormComponent } from './pages/trip-form/trip-form';
+import { ForoComponent } from './pages/foro/foro';
+import { ForoDetailComponent } from './pages/foro-detail/foro-detail';
 
 
 export const routes: Routes = [
@@ -48,6 +50,14 @@ export const routes: Routes = [
     path: 'editar-viaje/:id',
     component: TripFormComponent,
     canActivate: [authGuard],
+  },
+  {
+    path: 'foro',
+    component: ForoComponent,
+  },
+  {
+    path: 'foro/:id',
+    component: ForoDetailComponent,
   },
   {
     path: '**',

@@ -1,0 +1,55 @@
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.topic-content {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #333;
+}
+
+.avatar-placeholder {
+  flex-shrink: 0;
+}
+
+.reply-card {
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.reply-card:hover {
+  background-color: #e9ecef;
+  transform: translateX(5px);
+}
+
+.reply-avatar {
+  flex-shrink: 0;
+}
+
+.btn-outline-secondary {
+  transition: all 0.2s ease;
+}
+
+.btn-outline-secondary:hover {
+  transform: translateX(-4px);
+}
+
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.4em 0.8em;
+}
+
+.alert-link {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.replies-section h4 {
+  color: #495057;
+}

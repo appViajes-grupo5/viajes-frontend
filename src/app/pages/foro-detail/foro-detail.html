@@ -1,0 +1,148 @@
+<div class="page-container container py-4">
+  <!-- Botón de volver -->
+  <div class="mb-4">
+    <a routerLink="/foro" class="btn btn-outline-secondary rounded-pill">
+      <i class="bi bi-arrow-left me-2"></i>Volver al Foro
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="text-muted mt-3">Cargando tema...</p>
+    </div>
+  } @else if (topic()) {
+    <!-- Tema Principal -->
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body p-4">
+        <!-- Categoría -->
+        <span class="badge mb-3" [ngClass]="getCategoryClass(topic()!.category || 'General')">{{ topic()!.category }}</span>
+        
+        <!-- Título -->
+        <h2 class="fw-bold text-dark mb-3">{{ topic()!.title }}</h2>
+        
+        <!-- Info del autor y fecha -->
+        <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+          <div class="author-avatar">
+            <img 
+              [src]="topic()!.profile_picture_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + topic()!.first_name + topic()!.last_name" 
+              alt="Avatar" 
+              class="rounded-circle" 
+              width="48" 
+              height="48" 
+              style="object-fit: cover;">
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold">{{ topic()!.first_name }} {{ topic()!.last_name }}</div>
+            <div class="text-muted small">
+              <i class="bi bi-clock me-1"></i>
+              {{ topic()!.created_at | date: 'dd/MM/yyyy HH:mm' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido del tema -->
+        <div class="topic-content mt-3">
+          <p class="lead" style="white-space: pre-line;">{{ topic()!.content }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección de Respuestas -->
+    <div class="replies-section">
+      <h4 class="fw-bold mb-3">
+        <i class="bi bi-chat-dots me-2"></i>
+        Respuestas ({{ topic()!.replies?.length || 0 }})
+      </h4>
+
+      <!-- Lista de Respuestas -->
+      @if (topic()!.replies && topic()!.replies!.length > 0) {
+        <div class="replies-list mb-4">
+          @for (reply of topic()!.replies; track reply.reply_id) {
+            <div class="reply-card card mb-3 border-0 shadow-sm">
+              <div class="card-body p-3">
+                <div class="d-flex gap-3">
+                  <!-- Avatar -->
+                  <div class="reply-avatar">
+                    <img 
+                      [src]="reply.profile_picture_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + reply.first_name + reply.last_name" 
+                      alt="Avatar" 
+                      class="rounded-circle" 
+                      width="40" 
+                      height="40" 
+                      style="object-fit: cover;">
+                  </div>
+                  
+                  <!-- Contenido de la respuesta -->
+                  <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                        <span class="fw-semibold">{{ reply.first_name }} {{ reply.last_name }}</span>
+                        <span class="text-muted small ms-2">
+                          <i class="bi bi-clock me-1"></i>
+                          {{ reply.created_at | date: 'dd/MM/yyyy HH:mm' }}
+                        </span>
+                      </div>
+                    </div>
+                    <p class="mb-0" style="white-space: pre-line;">{{ reply.reply_text }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="text-center py-4 bg-light rounded mb-4">
+          <i class="bi bi-chat-text text-muted fs-3"></i>
+          <p class="text-muted mt-2 mb-0">No hay respuestas aún. ¡Sé el primero en comentar!</p>
+        </div>
+      }
+
+      <!-- Formulario para Responder -->
+      @if (isAuthenticated()) {
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <h5 class="fw-semibold mb-3">
+              <i class="bi bi-pencil me-2"></i>Escribe una respuesta
+            </h5>
+            <form (ngSubmit)="sendReply()">
+              <div class="mb-3">
+                <textarea 
+                  class="form-control" 
+                  [(ngModel)]="replyText" 
+                  name="replyText"
+                  rows="4"
+                  placeholder="Comparte tu opinión o responde a este tema..."
+                  required
+                  [disabled]="sendingReply()"></textarea>
+              </div>
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="sendingReply()">
+                @if (sendingReply()) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Enviando...
+                } @else {
+                  <i class="bi bi-send me-2"></i>Enviar Respuesta
+                }
+              </button>
+            </form>
+          </div>
+        </div>
+      } @else {
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          <a routerLink="/login" class="alert-link">Inicia sesión</a> para responder a este tema.
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="alert alert-warning text-center">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      No se encontró el tema solicitado.
+    </div>
+  }
+</div>
