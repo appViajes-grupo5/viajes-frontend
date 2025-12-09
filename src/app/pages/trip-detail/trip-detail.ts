@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TripService } from '../../services/trip.service';
 import { AuthService } from '../../services/auth.service'; // Necesario para obtener el ID del usuario
 import { Trip } from '../../models/trip.interface';
+import { getTripImageUrl } from '../../utils/trip-image.util';
 
 @Component({
   selector: 'app-trip-detail',
@@ -52,7 +53,7 @@ export class TripDetailComponent implements OnInit {
       error: (err) => {
         console.error('Error cargando el viaje', err);
         // Opcional: redirigir a 404 o home
-        this.router.navigate(['/']); 
+        this.router.navigate(['/']);
       }
     });
   }
@@ -62,7 +63,7 @@ export class TripDetailComponent implements OnInit {
     this.tripService.getParticipants(tripId).subscribe({
       next: (data) => {
         this.participants = data;
-        
+
         // Verificar si el usuario logueado está en la lista
         if (this.currentUserId) {
           // Asumimos que el backend devuelve objetos con 'user_id'
@@ -88,7 +89,7 @@ export class TripDetailComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    
+
     this.tripService.joinTrip(this.trip.trip_id, this.currentUserId).subscribe({
       next: () => {
         alert('¡Te has unido al viaje con éxito!');
@@ -141,5 +142,10 @@ export class TripDetailComponent implements OnInit {
         }
       });
     }
+  }
+
+  // Método para obtener imagen dinámica (igual que en trip-card)
+  getImageUrl(): string {
+    return this.trip ? getTripImageUrl(this.trip) : '';
   }
 }
