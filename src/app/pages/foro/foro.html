@@ -1,0 +1,149 @@
+<div class="container py-4">
+  <!-- Header del Foro -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-primary mb-1">
+        <i class="bi bi-chat-square-text me-2"></i>Foro de Discusión
+      </h2>
+      <p class="text-muted">Comparte tus ideas y conecta con otros viajeros</p>
+    </div>
+    @if (isAuthenticated()) {
+      <button class="btn btn-primary rounded-pill px-4" (click)="toggleForm()">
+        <i class="bi bi-plus-circle me-2"></i>
+        {{ showForm() ? 'Cancelar' : 'Nuevo Tema' }}
+      </button>
+    }
+  </div>
+
+  <!-- Formulario de Nuevo Tema -->
+  @if (showForm()) {
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body p-4">
+        <h5 class="card-title fw-bold mb-3">
+          <i class="bi bi-pencil-square me-2"></i>Crear Nuevo Tema
+        </h5>
+        <form (ngSubmit)="createTopic()">
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label for="title" class="form-label fw-semibold">Título del Tema</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="title" 
+                [(ngModel)]="newTopic.title" 
+                name="title"
+                placeholder="¿De qué quieres hablar?"
+                required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="category" class="form-label fw-semibold">Categoría</label>
+              <select 
+                class="form-select" 
+                id="category" 
+                [(ngModel)]="newTopic.category" 
+                name="category">
+                <option value="General">General</option>
+                <option value="Consejos">Consejos</option>
+                <option value="Destinos">Destinos</option>
+                <option value="Experiencias">Experiencias</option>
+                <option value="Preguntas">Preguntas</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="content" class="form-label fw-semibold">Contenido</label>
+            <textarea 
+              class="form-control" 
+              id="content" 
+              [(ngModel)]="newTopic.content" 
+              name="content"
+              rows="5"
+              placeholder="Describe tu tema de conversación..."
+              required></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-send me-2"></i>Publicar Tema
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="toggleForm()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="text-muted mt-3">Cargando temas del foro...</p>
+    </div>
+  }
+
+  <!-- Lista de Temas -->
+  @if (!loading()) {
+    <div class="topics-list">
+      @for (topic of topics(); track topic.topic_id) {
+        <div class="topic-card card mb-3 shadow-sm border-0" [routerLink]="['/foro', topic.topic_id]">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="flex-grow-1">
+                <!-- Categoría Badge -->
+                <span class="badge bg-info text-dark mb-2">{{ topic.category }}</span>
+                
+                <!-- Título -->
+                <h5 class="card-title fw-bold text-dark mb-2">{{ topic.title }}</h5>
+                
+                <!-- Contenido (preview) -->
+                <p class="card-text text-muted mb-3">
+                  {{ topic.content.length > 150 ? topic.content.substring(0, 150) + '...' : topic.content }}
+                </p>
+                
+                <!-- Meta información -->
+                <div class="topic-meta d-flex align-items-center gap-3 text-muted small">
+                  <span>
+                    <i class="bi bi-person-circle me-1"></i>
+                    {{ topic.first_name }} {{ topic.last_name }}
+                  </span>
+                  <span>
+                    <i class="bi bi-clock me-1"></i>
+                    {{ topic.created_at | date: 'dd/MM/yyyy HH:mm' }}
+                  </span>
+                  <span>
+                    <i class="bi bi-chat-dots me-1"></i>
+                    {{ topic.reply_count || 0 }} respuestas
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Icono de flecha -->
+              <div class="ms-3">
+                <i class="bi bi-chevron-right text-muted fs-4"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="text-center py-5 bg-light rounded">
+          <i class="bi bi-chat-dots fs-1 text-muted"></i>
+          <p class="mt-3 text-muted fw-semibold">No hay temas de conversación aún.</p>
+          @if (isAuthenticated()) {
+            <p class="text-muted">¡Sé el primero en crear uno!</p>
+            <button class="btn btn-primary mt-2" (click)="toggleForm()">
+              <i class="bi bi-plus-circle me-2"></i>Crear Tema
+            </button>
+          } @else {
+            <p class="text-muted">Inicia sesión para crear uno.</p>
+            <a routerLink="/login" class="btn btn-primary mt-2">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+            </a>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
