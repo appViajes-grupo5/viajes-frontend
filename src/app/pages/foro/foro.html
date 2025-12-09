@@ -105,8 +105,14 @@
                 
                 <!-- Meta información -->
                 <div class="topic-meta d-flex align-items-center gap-3 text-muted small">
-                  <span>
-                    <i class="bi bi-person-circle me-1"></i>
+                  <span class="d-flex align-items-center gap-2">
+                    <img 
+                      [src]="topic.profile_picture_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + topic.first_name + topic.last_name" 
+                      alt="Avatar" 
+                      class="rounded-circle" 
+                      width="24" 
+                      height="24" 
+                      style="object-fit: cover;">
                     {{ topic.first_name }} {{ topic.last_name }}
                   </span>
                   <span>

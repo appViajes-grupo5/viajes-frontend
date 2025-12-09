@@ -25,7 +25,7 @@ export class UserProfileComponent implements OnInit {
     private location: Location,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.profileForm = this.fb.group({
@@ -52,7 +52,7 @@ export class UserProfileComponent implements OnInit {
     this.authService.getCurrentUserFromApi().subscribe({
       next: (userData) => {
         this.isLoading = false;
-        
+
         // Cargar datos en el formulario
         this.profileForm.patchValue({
           firstName: userData.firstName || '',
@@ -65,6 +65,11 @@ export class UserProfileComponent implements OnInit {
           averageRating: userData.averageRating || 0,
           createdAt: userData.createdAt ? new Date(userData.createdAt) : new Date()
         });
+
+        // Generar avatar por defecto basado en el nombre del usuario
+        const firstName = userData.firstName || 'User';
+        const lastName = userData.lastName || '';
+        this.defaultAvatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${firstName}${lastName}`;
 
         // Actualizar vista previa de foto (si hay URL)
         if (userData.profilePictureUrl) {
@@ -110,7 +115,7 @@ export class UserProfileComponent implements OnInit {
         this.isSaving = false;
         this.successMessage = 'Perfil actualizado con éxito';
         this.profileForm.markAsPristine();
-        
+
         // Actualizar datos en el formulario con la respuesta
         this.profileForm.patchValue({
           firstName: response.firstName,

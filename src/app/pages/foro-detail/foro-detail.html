@@ -26,14 +26,13 @@
         <!-- Info del autor y fecha -->
         <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
           <div class="author-avatar">
-            @if (topic()!.profile_picture_url) {
-              <img [src]="topic()!.profile_picture_url" alt="Avatar" class="rounded-circle" width="48" height="48">
-            } @else {
-              <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center bg-primary text-white" 
-                   style="width: 48px; height: 48px;">
-                <i class="bi bi-person-fill fs-4"></i>
-              </div>
-            }
+            <img 
+              [src]="topic()!.profile_picture_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + topic()!.first_name + topic()!.last_name" 
+              alt="Avatar" 
+              class="rounded-circle" 
+              width="48" 
+              height="48" 
+              style="object-fit: cover;">
           </div>
           <div class="flex-grow-1">
             <div class="fw-semibold">{{ topic()!.first_name }} {{ topic()!.last_name }}</div>
@@ -67,14 +66,13 @@
                 <div class="d-flex gap-3">
                   <!-- Avatar -->
                   <div class="reply-avatar">
-                    @if (reply.profile_picture_url) {
-                      <img [src]="reply.profile_picture_url" alt="Avatar" class="rounded-circle" width="40" height="40">
-                    } @else {
-                      <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center bg-secondary text-white" 
-                           style="width: 40px; height: 40px;">
-                        <i class="bi bi-person-fill"></i>
-                      </div>
-                    }
+                    <img 
+                      [src]="reply.profile_picture_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + reply.first_name + reply.last_name" 
+                      alt="Avatar" 
+                      class="rounded-circle" 
+                      width="40" 
+                      height="40" 
+                      style="object-fit: cover;">
                   </div>
                   
                   <!-- Contenido de la respuesta -->
