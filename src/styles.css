@@ -61,5 +61,5 @@ app-footer {
 
 /* Ajuste específico para el home (hero section) - el hero ya tiene su propio padding */
 .hero-section {
-    padding-top: 80px;
+    padding-top: 110px !important;
 }
