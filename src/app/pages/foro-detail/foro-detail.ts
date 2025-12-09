@@ -85,4 +85,15 @@ export class ForoDetailComponent implements OnInit {
         const user = this.authService.getCurrentUser();
         return user?.id || null;
     }
+
+    getCategoryClass(category: string): string {
+        const categoryColors: { [key: string]: string } = {
+            'General': 'bg-secondary text-white',
+            'Consejos': 'bg-success text-white',
+            'Destinos': 'bg-primary text-white',
+            'Experiencias': 'bg-warning text-dark',
+            'Preguntas': 'bg-info text-dark'
+        };
+        return categoryColors[category] || 'bg-secondary text-white';
+    }
 }
