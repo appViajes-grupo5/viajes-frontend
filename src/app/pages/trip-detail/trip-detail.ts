@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TripService } from '../../services/trip.service';
+import { AuthService } from '../../services/auth.service'; // Necesario para obtener el ID del usuario
 import { Trip } from '../../models/trip.interface';
 
 @Component({
@@ -14,29 +15,62 @@ import { Trip } from '../../models/trip.interface';
 export class TripDetailComponent implements OnInit {
   // Inyección de dependencias
   private tripService = inject(TripService);
+  private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private location = inject(Location);
 
   trip?: Trip; // Aquí guardamos los datos del viaje
+  participants: any[] = []; // Lista de participantes
+  isJoined: boolean = false; // Estado local: ¿El usuario está unido?
+  currentUserId: number | null = null; // ID del usuario logueado
 
   ngOnInit() {
-    // 1. Obtenemos el ID de la URL
+    // 1. Obtener usuario actual (si existe) para saber quién navega
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.currentUserId = user.id;
+    }
+
+    // 2. Obtener ID del viaje desde la URL
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    // 2. Si hay ID, pedimos el viaje al servicio
+    // 3. Cargar datos si el ID es válido
     if (id) {
-      this.tripService.getTripById(id).subscribe({
-        next: (trip) => {
-          this.trip = trip;
-        },
-        error: (err) => {
-          console.error('Error cargando el viaje', err);
-          // Opcional: redirigir si no existe
-          // this.router.navigate(['/']);
-        }
-      });
+      this.loadTripData(id);
     }
+  }
+
+  // Carga secuencial: Viaje -> Participantes
+  loadTripData(id: number) {
+    this.tripService.getTripById(id).subscribe({
+      next: (trip) => {
+        this.trip = trip;
+        // Una vez tenemos el viaje, cargamos quién va
+        this.loadParticipants(id);
+      },
+      error: (err) => {
+        console.error('Error cargando el viaje', err);
+        // Opcional: redirigir a 404 o home
+        this.router.navigate(['/']); 
+      }
+    });
+  }
+
+  // Cargar participantes y calcular si 'yo' estoy dentro
+  loadParticipants(tripId: number) {
+    this.tripService.getParticipants(tripId).subscribe({
+      next: (data) => {
+        this.participants = data;
+        
+        // Verificar si el usuario logueado está en la lista
+        if (this.currentUserId) {
+          // Asumimos que el backend devuelve objetos con 'user_id'
+          this.isJoined = this.participants.some(p => p.user_id === this.currentUserId);
+        }
+      },
+      error: (err) => console.error('Error cargando participantes', err)
+    });
   }
 
   // Volver a la página anterior
@@ -48,24 +82,57 @@ export class TripDetailComponent implements OnInit {
   joinTrip() {
     if (!this.trip) return;
 
-    // Nota: Falta implemnetar cuando este backend
-    this.tripService.joinTrip(this.trip.trip_id);
-    alert('¡Solicitud enviada! (Falta parte Manuel)');
+    // Si no está logueado, mandar al login
+    if (!this.currentUserId) {
+      alert('Debes iniciar sesión para unirte a un viaje.');
+      this.router.navigate(['/login']);
+      return;
+    }
+    
+    this.tripService.joinTrip(this.trip.trip_id, this.currentUserId).subscribe({
+      next: () => {
+        alert('¡Te has unido al viaje con éxito!');
+        // Recargar datos para ver mi foto en la lista y actualizar botones
+        this.loadTripData(this.trip!.trip_id);
+      },
+      error: (err) => {
+        console.error('Error al unirse:', err);
+        alert('No se pudo completar la solicitud.');
+      }
+    });
   }
 
-  // Funcionalidad de BORRAR (La D de CRUD)
+  // SALIR del viaje (Cancelar reserva)
+  leaveTrip() {
+    if (!this.trip || !this.currentUserId) return;
+
+    if (!confirm('¿Estás seguro de que quieres cancelar tu plaza en este viaje?')) {
+      return;
+    }
+
+    this.tripService.leaveTrip(this.trip.trip_id, this.currentUserId).subscribe({
+      next: () => {
+        alert('Has salido del viaje.');
+        this.isJoined = false;
+        // Recargar para quitar mi foto de la lista
+        this.loadTripData(this.trip!.trip_id);
+      },
+      error: (err) => {
+        console.error('Error al salir:', err);
+        alert('Hubo un error al intentar salir del viaje.');
+      }
+    });
+  }
+
+  // ELIMINAR viaje (Solo debería ser visible para admin o creador)
   deleteTrip() {
-    // Primero verificamos que tenemos un viaje cargado
     if (!this.trip) return;
 
-    // Pedimos confirmación al usuario
     const confirmDelete = confirm(`¿Estás seguro de que quieres eliminar "${this.trip.title}"?`);
 
     if (confirmDelete) {
-      // 1. Borramos del servicio
       this.tripService.deleteTrip(this.trip.trip_id).subscribe({
         next: () => {
-          // 2. Redirigimos a la Home (o a /viajes)
           this.router.navigate(['/']);
         },
         error: (err) => {

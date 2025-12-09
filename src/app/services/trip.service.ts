@@ -34,15 +34,26 @@ export class TripService {
     getTripById(id: number): Observable<Trip> {
         return this.http.get<Trip>(`${this.apiUrl}/${id}`);
     }
-
+    // NUEVO: Obtener participantes de un viaje
+    getParticipants(tripId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/${tripId}/participants`);
+    }
+    
     // ==========================================
-    // MÉTODOS DE ACCIÓN (POST, PUT, DELETE)
+    // NUEVOS MÉTODOS PARA PARTICIPANTES
     // ==========================================
 
-    // Unirse a un viaje (Reservar plaza)
-    // POST /api/participants/join
-    // Nota: Falta implementar cuando Manuel tenga su parte
-    joinTrip(tripId: number): void {
+    
+    // Unirse a un viaje
+    // Modificación: Ahora devuelve un Observable y requiere userId
+    joinTrip(tripId: number, userId: number): Observable<any> {
+        return this.http.post(`${this.participantsUrl}/join`, { trip_id: tripId, user_id: userId });
+    }
+
+    // Salir de un viaje
+    // Modificación: Implementación real. DELETE con body requiere opciones especiales en Angular
+    leaveTrip(tripId: number, userId: number): Observable<any> {
+        return this.http.delete(`${this.participantsUrl}`, { body: { trip_id: tripId, user_id: userId } });
     }
 
     // Eliminar un viaje
