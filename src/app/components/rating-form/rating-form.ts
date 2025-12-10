@@ -1,11 +1,12 @@
 import { Component, Input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RatingsService, CreateRatingDto } from '../../services/ratings.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-rating-form',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './rating-form.html',
   styleUrl: './rating-form.css'
 })
