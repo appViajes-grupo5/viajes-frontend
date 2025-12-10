@@ -1,15 +1,16 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit,signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TripService } from '../../services/trip.service';
 import { AuthService } from '../../services/auth.service'; // Necesario para obtener el ID del usuario
 import { Trip } from '../../models/trip.interface';
 import { getTripImageUrl } from '../../utils/trip-image.util';
+import { RatingFormComponent } from '../../components/rating-form/rating-form';
 
 @Component({
   selector: 'app-trip-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, RatingFormComponent],
   templateUrl: './trip-detail.html',
   styleUrls: ['./trip-detail.css']
 })
@@ -25,6 +26,10 @@ export class TripDetailComponent implements OnInit {
   participants: any[] = []; // Lista de participantes
   isJoined: boolean = false; // Estado local: ¿El usuario está unido?
   currentUserId: number | null = null; // ID del usuario logueado
+  
+  // para ratings
+  puedeValorar = signal<boolean>(true);   // visible por ahora
+  usuarioAValorarId = signal<number>(0);  // sin funcionar por ahora
 
   ngOnInit() {
     // 1. Obtener usuario actual (si existe) para saber quién navega

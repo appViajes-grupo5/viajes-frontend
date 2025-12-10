@@ -1,0 +1,16 @@
+.rating-box {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  background: #fafafa;
+  max-width: 400px; /* Mucho más estrecho */
+}
+
+.star-small {
+  font-size: 1.3rem; /* Mucho más pequeño */
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.star-small:hover {
+  transform: scale(1.1);
+}

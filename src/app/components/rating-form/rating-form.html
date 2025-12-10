@@ -1,0 +1,31 @@
+<div class="rating-box p-2">
+  <h6 class="fw-bold mb-1">⭐ Valorar</h6>
+
+  <!-- Estrellas -->
+  <div class="mb-1 d-flex align-items-center gap-1">
+    @for (star of [1,2,3,4,5]; track star) {
+      <i 
+        class="bi"
+        [class.bi-star-fill]="star <= score()"
+        [class.bi-star]="star > score()"
+        class="text-warning star-small"
+        (click)="setScore(star)">
+      </i>
+    }
+  </div>
+
+  <!-- Comentario -->
+  <textarea     
+    class="form-control form-control-sm rounded-2 mb-2"
+    rows="1"
+    placeholder="Comentario (opcional)"
+    (input)="onCommentChange($event)">
+  </textarea>
+
+  <!-- Botón enviar -->
+  <button 
+    class="btn btn-success btn-sm rounded-pill px-3"
+    (click)="submitRating()">
+    Enviar
+  </button>
+</div>

@@ -90,7 +90,14 @@
 
     </div>
   </div>
-
+  <div class="mt-5">
+  @if (puedeValorar()) {
+    <app-rating-form
+      [tripId]="trip.trip_id"
+      [ratedUserId]="usuarioAValorarId()">
+    </app-rating-form>
+  }
+</div>
 </div>
 } @else {
 <div class="page-container container py-5 text-center mt-5">
