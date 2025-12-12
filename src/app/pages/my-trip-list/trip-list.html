@@ -37,8 +37,8 @@
           </p>
           <div class="mt-auto">
             <p class="card-text">
-              <strong>Fechas:</strong> {{ trip.start_date | date:'shortDate' }}
-              - {{ trip.end_date | date:'shortDate' }}
+              <strong>Fechas:</strong> {{ formatDate(trip.start_date) }} - {{
+              formatDate(trip.end_date) }}
             </p>
             <p class="card-text">
               <strong>Precio:</strong> {{ trip.estimated_cost | currency:'EUR'
