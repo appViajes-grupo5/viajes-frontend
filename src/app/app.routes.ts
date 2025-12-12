@@ -41,6 +41,10 @@ export const routes: Routes = [
     component: TripDetailComponent,
   },
   {
+    path: 'mis-viajes/:id',
+    component: TripDetailComponent,
+  },
+  {
     path: 'perfil',
     component: UserProfileComponent,
     canActivate: [authGuard],
