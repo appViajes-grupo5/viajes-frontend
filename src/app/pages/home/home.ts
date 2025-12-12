@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { TripService } from '../../services/trip';
+import { TripService } from '../../services/trip.service';
 import { TripCardComponent } from '../../components/trip-card/trip-card';
 import { Trip } from '../../models/trip.interface';
 

@@ -25,6 +25,7 @@ export class TripDetailComponent implements OnInit {
   trip?: Trip; // Aquí guardamos los datos del viaje
   participants: any[] = []; // Lista de participantes
   isJoined: boolean = false; // Estado local: ¿El usuario está unido?
+  isCreator: boolean = false; // Estado local: ¿El usuario creó el viaje?
   currentUserId: number | null = null; // ID del usuario logueado
 
   // para ratings
@@ -52,6 +53,10 @@ export class TripDetailComponent implements OnInit {
     this.tripService.getTripById(id).subscribe({
       next: (trip) => {
         this.trip = trip;
+        // Calcular si soy el creador (usando conversión a número por seguridad)
+        if (this.trip && this.currentUserId) {
+          this.isCreator = Number(this.trip.creator_id) === Number(this.currentUserId);
+        }
         // Una vez tenemos el viaje, cargamos quién va
         this.loadParticipants(id);
       },
