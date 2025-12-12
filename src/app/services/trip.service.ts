@@ -29,6 +29,12 @@ export class TripService {
         return this.http.get<Trip[]>(this.apiUrl);
     }
 
+    // Obtener mis viajes
+    // GET /api/trips
+    getMyTrips(): Observable<Trip[]> {
+        return this.http.get<Trip[]>(this.apiUrl+"/me");
+    }
+
     // Obtener el detalle de un viaje por su ID
     // GET /api/trips/:id
     getTripById(id: number): Observable<Trip> {

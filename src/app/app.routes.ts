@@ -10,6 +10,7 @@ import { authGuard } from './context-guards/auth.guard';
 import { TripFormComponent } from './pages/trip-form/trip-form';
 import { ForoComponent } from './pages/foro/foro';
 import { ForoDetailComponent } from './pages/foro-detail/foro-detail';
+import { TripMyListComponent } from './pages/my-trip-list/trip-list';
 
 
 export const routes: Routes = [
@@ -28,6 +29,11 @@ export const routes: Routes = [
   {
     path: 'viajes',
     component: TripListComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'mis-viajes',
+    component: TripMyListComponent,
     canActivate: [authGuard],
   },
   {

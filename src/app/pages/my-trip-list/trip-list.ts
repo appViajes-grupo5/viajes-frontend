@@ -7,15 +7,16 @@ import { Trip } from '../../models/trip.interface';
 import { getTripImageUrl } from '../../utils/trip-image.util';
 
 @Component({
-  selector: 'app-trip-list',
+  selector: 'app-trip-my-list',
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './trip-list.html',
   styleUrls: ['./trip-list.css'],
 })
-export class TripListComponent implements OnInit {
+export class TripMyListComponent implements OnInit {
   userName: string = '';
   trips: Trip[] = [];
+  loading: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -23,17 +24,21 @@ export class TripListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loading = true;
     const user = this.authService.getCurrentUser();
     if (user) {
       this.userName = user.name;
     }
 
-    this.tripService.getTrips().subscribe({
+    this.tripService.getMyTrips().subscribe({
       next: (data) => {
         this.trips = data;
       },
       error: (err) => {
         console.error('Error al obtener viajes', err);
+      },
+      complete: () => {
+        this.loading = false;
       },
     });
   }

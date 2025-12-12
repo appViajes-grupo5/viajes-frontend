@@ -1,15 +1,17 @@
 <div class="container mt-4">
-  <!-- Mensaje de Bienvenida -->
-  <div class="alert alert-success" role="alert">
-    <h4 class="alert-heading">¡Bienvenido, {{ userName }}!</h4>
-  </div>
-
   <!-- Contenido de la lista de viajes -->
   <div class="row">
     <div class="col-12 mb-3">
-      <h2>Lista de Viajes</h2>
+      <h2>Lista de mis Viajes</h2>
     </div>
 
+    @if (loading){
+      <div class="col-12">
+        <div class="loader"> Cargando...</div>
+      </div>
+    }
+
+    @if (!loading){
     @for (trip of trips; track trip.trip_id) {
     <div class="col-md-4 mb-4">
       <div class="card h-100 shadow-sm">
@@ -36,5 +38,6 @@
       <p class="text-center">No hay viajes disponibles en este momento.</p>
     </div>
     }
+  }
   </div>
 </div>
