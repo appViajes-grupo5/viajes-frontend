@@ -11,5 +11,6 @@ export function getTripImageUrl(trip: Trip): string {
     const imageId = (trip.trip_id * 137) % 1000; // Números del 0-999
 
     // Picsum Photos proporciona imágenes de placeholder
-    return `https://picsum.photos/id/${imageId}/800/600`;
+    // Picsum Photos con 'seed' garantiza una imagen única por ID pero que siempre existe
+    return `https://picsum.photos/seed/${trip.trip_id}/800/601`;
 }

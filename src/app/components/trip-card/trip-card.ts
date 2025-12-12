@@ -33,6 +33,11 @@ export class TripCardComponent {
 
   // Método para obtener imagen dinámica
   getImageUrl(): string {
-    return getTripImageUrl(this.trip());
+    const t = this.trip();
+    if (!t || !t.trip_id) {
+      console.warn('Trip invalido o sin ID:', t);
+      return 'assets/placeholder.jpg'; // Fallback local si existiera
+    }
+    return getTripImageUrl(t);
   }
 }

@@ -1,7 +1,8 @@
 <div class="card h-100 shadow-sm border-0 trip-card">
 
   <div class="position-relative">
-    <img [src]="getImageUrl()" class="card-img-top" [alt]="trip().title">
+    <img [src]="getImageUrl()" class="card-img-top" [alt]="trip().title"
+      onerror="this.src='https://placehold.co/600x400?text=Viaje'">
     <span class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">
       <i class="bi bi-geo-alt-fill text-danger"></i> {{ trip().destination }}
     </span>

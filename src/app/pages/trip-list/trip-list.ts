@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TripService } from '../../services/trip.service';
 import { Trip } from '../../models/trip.interface';
+import { getTripImageUrl } from '../../utils/trip-image.util';
 
 @Component({
   selector: 'app-trip-list',
@@ -35,5 +36,9 @@ export class TripListComponent implements OnInit {
         console.error('Error al obtener viajes', err);
       }
     });
+  }
+
+  getImage(trip: Trip): string {
+    return getTripImageUrl(trip);
   }
 }
