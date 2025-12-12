@@ -1,4 +1,4 @@
-import { Component, inject, OnInit,signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TripService } from '../../services/trip.service';
@@ -26,7 +26,7 @@ export class TripDetailComponent implements OnInit {
   participants: any[] = []; // Lista de participantes
   isJoined: boolean = false; // Estado local: ¿El usuario está unido?
   currentUserId: number | null = null; // ID del usuario logueado
-  
+
   // para ratings
   puedeValorar = signal<boolean>(true);   // visible por ahora
   usuarioAValorarId = signal<number>(0);  // sin funcionar por ahora
@@ -103,7 +103,8 @@ export class TripDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al unirse:', err);
-        alert('No se pudo completar la solicitud.');
+        const msg = err.error?.error || 'No se pudo completar la solicitud.';
+        alert(msg);
       }
     });
   }
@@ -125,7 +126,8 @@ export class TripDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al salir:', err);
-        alert('Hubo un error al intentar salir del viaje.');
+        const msg = err.error?.error || 'Hubo un error al intentar salir del viaje.';
+        alert(msg);
       }
     });
   }
