@@ -8,10 +8,7 @@
   <div class="row shadow rounded-4 overflow-hidden border bg-white">
 
     <div class="col-lg-6 p-0" style="min-height: 400px;">
-      <img 
-        [src]="getImageUrl()" 
-        class="w-100 h-100 object-fit-cover" 
-        [alt]="trip.title">
+      <img [src]="getImageUrl()" class="w-100 h-100 object-fit-cover" [alt]="trip.title">
     </div>
 
     <div class="col-lg-6 p-5">
@@ -43,21 +40,21 @@
       <p class="text-muted lead fs-6">{{ trip.description }}</p>
 
       @if (participants.length > 0) {
-        <div class="mb-4">
-          <h6 class="fw-bold text-secondary mb-2">Ya se han apuntado:</h6>
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            @for (p of participants; track $index) {
-              <div class="d-flex flex-column align-items-center" style="width: 50px;">
-                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm" 
-                     style="width: 40px; height: 40px; font-size: 1.2rem;" 
-                     [title]="p.firstName">
-                  {{ p.firstName?.charAt(0) | uppercase }}
-                </div>
-                <small class="text-truncate w-100 text-center" style="font-size: 0.7rem;">{{ p.firstName }}</small>
-              </div>
-            }
+      <div class="mb-4">
+        <h6 class="fw-bold text-secondary mb-2">Ya se han apuntado:</h6>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          @for (p of participants; track $index) {
+          <div class="d-flex flex-column align-items-center" style="width: 50px;">
+            <div
+              class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm"
+              style="width: 40px; height: 40px; font-size: 1.2rem;" [title]="p.firstName">
+              {{ p.firstName?.charAt(0) | uppercase }}
+            </div>
+            <small class="text-truncate w-100 text-center" style="font-size: 0.7rem;">{{ p.firstName }}</small>
           </div>
+          }
         </div>
+      </div>
       }
 
       <hr class="my-4 opacity-10">
@@ -68,17 +65,18 @@
       </p>
 
       <div class="mt-4 pt-2 d-flex gap-2 flex-wrap">
-        
+
         @if (!isJoined) {
-          <button (click)="joinTrip()" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
-            <i class="bi bi-check-lg me-1"></i> ¡Me apunto!
-          </button>
+        <button (click)="joinTrip()" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
+          <i class="bi bi-check-lg me-1"></i> ¡Me apunto!
+        </button>
         } @else {
-          <button (click)="leaveTrip()" class="btn btn-warning px-4 py-2 rounded-pill shadow-sm">
-            <i class="bi bi-x-circle me-1"></i> Cancelar plaza
-          </button>
+        <button (click)="leaveTrip()" class="btn btn-warning px-4 py-2 rounded-pill shadow-sm">
+          <i class="bi bi-x-circle me-1"></i> Cancelar plaza
+        </button>
         }
 
+        @if (isCreator) {
         <a [routerLink]="['/editar-viaje', trip.trip_id]" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
           <i class="bi bi-pencil me-1"></i> Editar
         </a>
@@ -86,18 +84,17 @@
         <button (click)="deleteTrip()" class="btn btn-outline-danger px-4 py-2 rounded-pill">
           <i class="bi bi-trash me-1"></i> Borrar
         </button>
+        }
       </div>
 
     </div>
   </div>
   <div class="mt-5">
-  @if (puedeValorar()) {
-    <app-rating-form
-      [tripId]="trip.trip_id"
-      [ratedUserId]="usuarioAValorarId()">
+    @if (puedeValorar()) {
+    <app-rating-form [tripId]="trip.trip_id" [ratedUserId]="usuarioAValorarId()">
     </app-rating-form>
-  }
-</div>
+    }
+  </div>
 </div>
 } @else {
 <div class="page-container container py-5 text-center mt-5">
