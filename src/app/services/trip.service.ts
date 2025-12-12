@@ -36,7 +36,7 @@ export class TripService {
     }
     // NUEVO: Obtener participantes de un viaje
     getParticipants(tripId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/${tripId}/participants`);
+        return this.http.get<any[]>(`${this.participantsUrl}/trip/${tripId}`);
     }
 
     // ==========================================
@@ -62,5 +62,18 @@ export class TripService {
     // DELETE /api/trips/:id
     deleteTrip(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
+
+    // Creación de viaje (POST)
+    createTrip(trip: Trip): Observable<any> {
+        // En el backend: router.post('/', verifyToken, tripController.createTrip);
+        return this.http.post(this.apiUrl, trip);
+    }
+
+    // Edición de viaje (PUT)
+    updateTrip(trip: Trip): Observable<any> {
+        // En el backend: router.put('/:id', verifyToken, tripController.updateTrip);
+        // trip.trip_id debe existir
+        return this.http.put(`${this.apiUrl}/${trip.trip_id}`, trip);
     }
 }

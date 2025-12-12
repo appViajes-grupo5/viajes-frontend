@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TripService } from '../../services/trip';
+import { TripService } from '../../services/trip.service';
 import { Trip } from '../../models/trip.interface';
 
 @Component({
@@ -69,7 +69,7 @@ export class TripFormComponent implements OnInit {
           error: (err) => console.error('Error updating trip', err)
         });
       } else {
-        this.tripService.addTrip(formValues).subscribe({
+        this.tripService.createTrip(formValues).subscribe({
           next: (response) => {
             // El backend devuelve { message: "...", trip_id: ... }
             const newId = response.trip_id;
