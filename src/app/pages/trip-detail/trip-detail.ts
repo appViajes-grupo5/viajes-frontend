@@ -24,12 +24,16 @@ export class TripDetailComponent implements OnInit {
 
   trip?: Trip; // Aquí guardamos los datos del viaje
   participants: any[] = []; // Lista de participantes
-  isJoined: boolean = false; // Estado local: ¿El usuario está unido?
+  
   currentUserId: number | null = null; // ID del usuario logueado
+
+  isCreator: boolean = false;
+  isJoined: boolean = false; // Estado local: ¿El usuario está unido?
+  isApproved: boolean = false; // Nuevo: Solo si el status es 'approved'
 
   // para ratings
   puedeValorar = signal<boolean>(true);   // visible por ahora
-  usuarioAValorarId = signal<number>(0);  // sin funcionar por ahora
+  usuarioAValorarId = signal<number>(0);  // sin funcionar por ahora, en el futuro para valorar participantes
 
   ngOnInit() {
     // 1. Obtener usuario actual (si existe) para saber quién navega
@@ -52,6 +56,10 @@ export class TripDetailComponent implements OnInit {
     this.tripService.getTripById(id).subscribe({
       next: (trip) => {
         this.trip = trip;
+        // Determinar si soy el creador
+        if (this.currentUserId && trip.creator_id === this.currentUserId) {
+          this.isCreator = true;
+        }
         // Una vez tenemos el viaje, cargamos quién va
         this.loadParticipants(id);
       },
@@ -68,15 +76,45 @@ export class TripDetailComponent implements OnInit {
     this.tripService.getParticipants(tripId).subscribe({
       next: (data) => {
         this.participants = data;
+        this.isJoined = false;
+        this.isApproved = false;
 
-        // Verificar si el usuario logueado está en la lista
         if (this.currentUserId) {
-          // Asumimos que el backend devuelve objetos con 'user_id'
-          this.isJoined = this.participants.some(p => p.user_id === this.currentUserId);
+          const myRecord = this.participants.find(p => p.user_id === this.currentUserId);
+          if (myRecord) {
+            this.isJoined = true;
+            this.isApproved = myRecord.status === 'accepted' || myRecord.status === 'approved';
+          }
         }
+
+        // Calcular lógica de valoración
+        this.calcularPuedeValorar();
       },
       error: (err) => console.error('Error cargando participantes', err)
     });
+  }
+
+  calcularPuedeValorar() {
+    if (!this.trip) return;
+
+    const today = new Date();
+    const endDate = new Date(this.trip.end_date);
+    
+    // Condición 1: El viaje debe haber terminado
+    const tripFinished = today > endDate;
+
+    // Condición 2: El usuario debe ser participante APROBADO (no creador, el creador no se valora a sí mismo aquí)
+    // Aquí asumimos valoración al CREADOR o al VIAJE en general.
+    
+    if (tripFinished && this.isApproved) {
+        this.puedeValorar.set(true);
+        // Si valoramos al creador:
+        if (this.trip.creator_id) {
+            this.usuarioAValorarId.set(this.trip.creator_id);
+        }
+    } else {
+        this.puedeValorar.set(false);
+    }
   }
 
   // Volver a la página anterior
@@ -88,22 +126,25 @@ export class TripDetailComponent implements OnInit {
   joinTrip() {
     if (!this.trip) return;
 
-    // Si no está logueado, mandar al login
     if (!this.currentUserId) {
-      alert('Debes iniciar sesión para unirte a un viaje.');
+      alert('Debes iniciar sesión para unirte.');
       this.router.navigate(['/login']);
       return;
+    }
+    
+    if (this.isCreator) {
+        alert('Eres el creador del viaje, no necesitas unirte.');
+        return;
     }
 
     this.tripService.joinTrip(this.trip.trip_id, this.currentUserId).subscribe({
       next: () => {
-        alert('¡Te has unido al viaje con éxito!');
-        // Recargar datos para ver mi foto en la lista y actualizar botones
-        this.loadTripData(this.trip!.trip_id);
+        alert('¡Solicitud enviada! Tu estado ahora es pendiente.');
+        this.loadTripData(this.trip!.trip_id); // Recargar para actualizar UI
       },
       error: (err) => {
         console.error('Error al unirse:', err);
-        const msg = err.error?.error || 'No se pudo completar la solicitud.';
+        const msg = err.error?.error || 'Error al intentar unirse al viaje.';
         alert(msg);
       }
     });
@@ -121,13 +162,14 @@ export class TripDetailComponent implements OnInit {
       next: () => {
         alert('Has salido del viaje.');
         this.isJoined = false;
+        this.isApproved = false;
+        this.puedeValorar.set(false);
         // Recargar para quitar mi foto de la lista
         this.loadTripData(this.trip!.trip_id);
       },
       error: (err) => {
         console.error('Error al salir:', err);
-        const msg = err.error?.error || 'Hubo un error al intentar salir del viaje.';
-        alert(msg);
+        alert('Hubo un error al intentar salir del viaje.');
       }
     });
   }
@@ -136,19 +178,17 @@ export class TripDetailComponent implements OnInit {
   deleteTrip() {
     if (!this.trip) return;
 
-    const confirmDelete = confirm(`¿Estás seguro de que quieres eliminar "${this.trip.title}"?`);
+    if (!confirm(`¿Estás seguro de eliminar el viaje "${this.trip.title}"? Esta acción no se puede deshacer.`)) return;
 
-    if (confirmDelete) {
-      this.tripService.deleteTrip(this.trip.trip_id).subscribe({
-        next: () => {
-          this.router.navigate(['/']);
-        },
-        error: (err) => {
-          console.error('Error eliminando el viaje', err);
-          alert('Hubo un error al eliminar el viaje');
-        }
-      });
-    }
+    this.tripService.deleteTrip(this.trip.trip_id).subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        console.error('Error eliminando viaje', err);
+        alert('Error eliminando el viaje.');
+      }
+    });
   }
 
   // Método para obtener imagen dinámica (igual que en trip-card)
