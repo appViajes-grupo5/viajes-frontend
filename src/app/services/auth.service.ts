@@ -11,6 +11,12 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface RegisterResponse {
+  message: string;
+  id: number;
+  email: string;
+}
+
 export interface User {
   id: number;
   name: string;
@@ -47,29 +53,14 @@ export class AuthService {
       );
   }
 
-  register(email: string, password: string, firstName: string, lastName?: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/register`, {
+  register(email: string, password: string, firstName: string, lastName?: string): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, {
       email,
       password,
       firstName,
       lastName
-    })
-      .pipe(
-        tap(response => {
-          // Guardar token y usuario en localStorage
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify({
-            id: response.id,
-            name: response.name,
-            email: response.email
-          }));
-          this.currentUserSubject.next({
-            id: response.id,
-            name: response.name,
-            email: response.email
-          });
-        })
-      );
+    });
+    // No guardamos token ni usuario porque el usuario debe confirmar primero
   }
 
   logout(): void {
