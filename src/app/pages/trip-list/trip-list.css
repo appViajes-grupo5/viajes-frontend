@@ -4,3 +4,13 @@
   padding-bottom: 40px;
   min-height: calc(100vh - 90px);
 }
+
+.trip-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+}
+
+.trip-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
+}

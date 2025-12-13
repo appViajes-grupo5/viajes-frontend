@@ -23,16 +23,36 @@ export class TripService {
     // MÉTODOS DE LECTURA (GET)
     // ==========================================
 
-    // Obtener todos los viajes disponibles
-    // GET /api/trips
-    getTrips(): Observable<Trip[]> {
-        return this.http.get<Trip[]>(this.apiUrl);
+    getTrips(filters?: any, page: number = 1, limit: number = 20): Observable<any> {
+        let params: any = { page, limit };
+        if (filters) {
+            if (filters.destination) params.destination = filters.destination;
+            if (filters.startDateFrom) params.startDateFrom = filters.startDateFrom;
+            if (filters.startDateTo) params.startDateTo = filters.startDateTo;
+            if (filters.endDateFrom) params.endDateFrom = filters.endDateFrom;
+            if (filters.endDateTo) params.endDateTo = filters.endDateTo;
+            if (filters.minCost) params.minCost = filters.minCost;
+            if (filters.maxCost) params.maxCost = filters.maxCost;
+            if (filters.sortBy) params.sortBy = filters.sortBy;
+            if (filters.sortOrder) params.sortOrder = filters.sortOrder;
+        }
+        return this.http.get<any>(this.apiUrl, { params });
     }
 
-    // Obtener mis viajes
-    // GET /api/trips
-    getMyTrips(): Observable<Trip[]> {
-        return this.http.get<Trip[]>(this.apiUrl+"/me");
+    getMyTrips(filters?: any, page: number = 1, limit: number = 20): Observable<any> {
+        let params: any = { page, limit };
+        if (filters) {
+            if (filters.destination) params.destination = filters.destination;
+            if (filters.startDateFrom) params.startDateFrom = filters.startDateFrom;
+            if (filters.startDateTo) params.startDateTo = filters.startDateTo;
+            if (filters.endDateFrom) params.endDateFrom = filters.endDateFrom;
+            if (filters.endDateTo) params.endDateTo = filters.endDateTo;
+            if (filters.minCost) params.minCost = filters.minCost;
+            if (filters.maxCost) params.maxCost = filters.maxCost;
+            if (filters.sortBy) params.sortBy = filters.sortBy;
+            if (filters.sortOrder) params.sortOrder = filters.sortOrder;
+        }
+        return this.http.get<any>(`${this.apiUrl}/me`, { params });
     }
 
     // Obtener el detalle de un viaje por su ID
@@ -58,10 +78,13 @@ export class TripService {
     }
 
     // Salir de un viaje
-    // Modificación: Implementación real. DELETE con body requiere opciones especiales en Angular
-    // CORRECCIÓN: Backend espera 'tripId' y ruta /leave
     leaveTrip(tripId: number, userId: number): Observable<any> {
         return this.http.delete(`${this.participantsUrl}/leave`, { body: { tripId } });
+    }
+
+    // Aceptar o rechazar solicitud de participante (solo creador)
+    updateParticipantStatus(tripId: number, userId: number, status: 'approved' | 'rejected'): Observable<any> {
+        return this.http.put(`${this.participantsUrl}/status`, { tripId, userId, status });
     }
 
     // Eliminar un viaje

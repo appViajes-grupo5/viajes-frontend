@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -7,19 +7,27 @@ import { Trip } from '../../models/trip.interface';
 import { getTripImageUrl } from '../../utils/trip-image.util';
 import { TripFormComponent } from '../../components/trip/create/trip-form';
 import { TripEditFormComponent } from '../../components/trip/editar/trip-form';
+import { TripFiltersComponent, TripFilters } from '../../components/trip-filters/trip-filters';
+import { TripPaginationComponent } from '../../components/trip-pagination/trip-pagination';
 declare var bootstrap: any;
+
 @Component({
   selector: 'app-trip-my-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, TripFormComponent, TripEditFormComponent],
+  imports: [CommonModule, RouterLink, TripFormComponent, TripEditFormComponent, TripFiltersComponent, TripPaginationComponent],
   templateUrl: './trip-list.html',
   styleUrls: ['./trip-list.css'],
 })
 export class TripMyListComponent implements OnInit {
   userName: string = '';
   trips: Trip[] = [];
-  loading: boolean = false;
+  loading = signal<boolean>(false);
   selectTrip: number | null = null;
+  currentPage = signal<number>(1);
+  totalPages = signal<number>(1);
+  total = signal<number>(0);
+  limit = 20;
+  filters = signal<TripFilters | null>(null);
 
   constructor(
     private authService: AuthService,
@@ -27,7 +35,7 @@ export class TripMyListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loading = true;
+    this.loading.set(true);
     const user = this.authService.getCurrentUser();
     if (user) {
       this.userName = user.name;
@@ -44,18 +52,38 @@ export class TripMyListComponent implements OnInit {
   }
 
   cargarViajes() {
-    this.tripService.getMyTrips().subscribe({
+    this.loading.set(true);
+    this.tripService.getMyTrips(this.filters(), this.currentPage(), this.limit).subscribe({
       next: (data) => {
-        this.trips = data;
+        this.trips = data.trips || [];
+        this.totalPages.set(data.totalPages || 1);
+        this.total.set(data.total || 0);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error('Error al obtener viajes', err);
-      },
-      complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
     this.selectTrip = null;
+  }
+
+  onFiltersChange(filters: TripFilters) {
+    this.filters.set(filters);
+    this.currentPage.set(1);
+    this.cargarViajes();
+  }
+
+  onClearFilters() {
+    this.filters.set(null);
+    this.currentPage.set(1);
+    this.cargarViajes();
+  }
+
+  onPageChange(page: number) {
+    this.currentPage.set(page);
+    this.cargarViajes();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   abrirModalEditarTrip(idTrip: number) {

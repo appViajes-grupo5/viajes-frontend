@@ -92,25 +92,48 @@
 
       @if (participants.length > 0) {
       <div class="mb-4">
-        <h6 class="fw-bold text-secondary mb-2">Ya se han apuntado:</h6>
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-          @for (p of participants; track $index) {
-          <div
-            class="d-flex flex-column align-items-center"
-            style="width: 50px"
-          >
-            <div
-              class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm"
-              style="width: 40px; height: 40px; font-size: 1.2rem"
-              [title]="p.firstName"
-            >
-              {{ p.firstName?.charAt(0) | uppercase }}
+        <h6 class="fw-bold text-secondary mb-2">Participantes:</h6>
+        <div class="d-flex flex-column gap-2">
+          @for (p of participants; track p.user_id) {
+          <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded">
+            <div class="d-flex align-items-center gap-2">
+              <div
+                class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm"
+                style="width: 40px; height: 40px; font-size: 1.2rem"
+              >
+                {{ p.first_name?.charAt(0) | uppercase }}
+              </div>
+              <div>
+                <div class="fw-bold">{{ p.first_name }} {{ p.last_name || '' }}</div>
+                <small class="text-muted">
+                  @if (p.status === 'approved') {
+                    <span class="badge bg-success">Aceptado</span>
+                  } @else if (p.status === 'pending') {
+                    <span class="badge bg-warning">Pendiente</span>
+                  } @else {
+                    <span class="badge bg-danger">Rechazado</span>
+                  }
+                </small>
+              </div>
             </div>
-            <small
-              class="text-truncate w-100 text-center"
-              style="font-size: 0.7rem"
-              >{{ p.firstName }}</small
-            >
+            @if (isCreator && p.status === 'pending') {
+            <div class="d-flex gap-2">
+              <button
+                (click)="approveParticipant(p.user_id)"
+                class="btn btn-sm btn-success"
+                title="Aceptar"
+              >
+                <i class="bi bi-check-lg"></i>
+              </button>
+              <button
+                (click)="rejectParticipant(p.user_id)"
+                class="btn btn-sm btn-danger"
+                title="Rechazar"
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+            }
           </div>
           }
         </div>
@@ -128,16 +151,33 @@
 
       <div class="mt-4 pt-2 d-flex gap-2 flex-wrap">
         @if (!isJoined) {
-        <button
-          (click)="joinTrip()"
-          class="btn btn-primary px-4 py-2 rounded-pill shadow-sm"
-        >
-          <i class="bi bi-check-lg me-1"></i> ¡Me apunto!
-        </button>
+          @if (puedeUnirse()) {
+            <button
+              (click)="joinTrip()"
+              class="btn btn-primary px-4 py-2 rounded-pill shadow-sm"
+            >
+              <i class="bi bi-check-lg me-1"></i> ¡Me apunto!
+            </button>
+          } @else {
+            <button
+              class="btn btn-secondary px-4 py-2 rounded-pill shadow-sm"
+              disabled
+              [title]="tripStatus() === 'ongoing' ? 'El viaje ya ha comenzado' : 'El viaje ya ha finalizado'"
+            >
+              <i class="bi bi-lock me-1"></i>
+              @if (tripStatus() === 'ongoing') {
+                Viaje en curso
+              } @else {
+                Viaje finalizado
+              }
+            </button>
+          }
         } @else {
         <button
           (click)="leaveTrip()"
+          [disabled]="tripStatus() === 'ongoing' || tripStatus() === 'finished'"
           class="btn btn-warning px-4 py-2 rounded-pill shadow-sm"
+          [title]="(tripStatus() === 'ongoing' || tripStatus() === 'finished') ? 'No puedes cancelar tu plaza porque el viaje ya comenzó o finalizó' : ''"
         >
           <i class="bi bi-x-circle me-1"></i> Cancelar plaza
         </button>
@@ -160,12 +200,91 @@
     </div>
   </div>
   <div class="mt-5">
-    @if (puedeValorar()) {
-    <app-rating-form
+    @if (isApproved || isCreator) {
+    <app-trip-comments
       [tripId]="trip.trip_id"
-      [ratedUserId]="usuarioAValorarId()"
-    >
-    </app-rating-form>
+      [isApproved]="isApproved || isCreator"
+    ></app-trip-comments>
+    }
+  </div>
+
+  <div class="mt-5">
+    @if (tripStatus() === 'upcoming') {
+      <div class="alert alert-info">
+        <i class="bi bi-calendar-event me-2"></i>
+        <strong>Viaje próximo:</strong> Este viaje aún no ha comenzado. Las calificaciones estarán disponibles después de que finalice.
+      </div>
+    } @else if (tripStatus() === 'ongoing') {
+      <div class="alert alert-warning">
+        <i class="bi bi-clock me-2"></i>
+        <strong>Viaje en curso:</strong> Este viaje está actualmente en progreso. Podrás calificar a los participantes una vez que finalice.
+      </div>
+    } @else if (puedeValorar() && usuariosParaValorar().length > 0) {
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="bi bi-star-fill me-2"></i>Calificar Participantes</h5>
+        </div>
+        <div class="card-body">
+          @if (usuariosParaValorar().length > 1) {
+            <div class="mb-3">
+              <label class="form-label fw-bold">Selecciona a quién quieres calificar:</label>
+              <div class="list-group">
+                @for (user of usuariosParaValorar(); track user.user_id) {
+                  <button
+                    type="button"
+                    class="list-group-item list-group-item-action"
+                    [class.active]="selectedUserToRate() === user.user_id"
+                    (click)="selectUserToRate(user.user_id)"
+                  >
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span>
+                        <i class="bi bi-person-circle me-2"></i>
+                        {{ user.first_name }} {{ user.last_name }}
+                        @if (user.isCreator) {
+                          <span class="badge bg-primary ms-2">Creador</span>
+                        }
+                      </span>
+                      @if (selectedUserToRate() === user.user_id) {
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                      }
+                    </div>
+                  </button>
+                }
+              </div>
+            </div>
+          } @else if (usuariosParaValorar().length === 1) {
+            <div class="mb-3">
+              <p class="text-muted">
+                <i class="bi bi-info-circle me-2"></i>
+                Calificando a: <strong>{{ usuariosParaValorar()[0].first_name }} {{ usuariosParaValorar()[0].last_name }}</strong>
+                @if (usuariosParaValorar()[0].isCreator) {
+                  <span class="badge bg-primary ms-2">Creador</span>
+                }
+              </p>
+            </div>
+          }
+          
+          @if (selectedUserToRate() && !isRefreshingRatings()) {
+            <app-rating-form
+              [tripId]="trip.trip_id"
+              [ratedUserId]="selectedUserToRate()!"
+              [onRatingSubmitted]="onRatingSubmitted"
+            ></app-rating-form>
+          } @else if (isRefreshingRatings()) {
+            <div class="text-center py-3">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Actualizando...</span>
+              </div>
+              <p class="text-muted mt-2 mb-0">Actualizando lista...</p>
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (tripStatus() === 'finished' && isApproved && !puedeValorar() && usuariosParaValorar().length === 0) {
+      <div class="alert alert-success">
+        <i class="bi bi-check-circle me-2"></i>
+        <strong>¡Gracias!</strong> Ya has calificado a todos los participantes disponibles de este viaje.
+      </div>
     }
   </div>
 </div>

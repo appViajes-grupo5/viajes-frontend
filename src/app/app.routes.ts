@@ -8,9 +8,10 @@ import { TripDetailComponent } from './pages/trip-detail/trip-detail';
 import { UserProfileComponent } from './pages/user-profile/user-profile';
 import { authGuard } from './context-guards/auth.guard';
 import { TripFormComponent } from './pages/trip-form/trip-form';
-import { ForoComponent } from './pages/foro/foro';
-import { ForoDetailComponent } from './pages/foro-detail/foro-detail';
 import { TripMyListComponent } from './pages/my-trip-list/trip-list';
+import { HowItWorksComponent } from './pages/how-it-works/how-it-works';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password';
 
 
 export const routes: Routes = [
@@ -35,6 +36,14 @@ export const routes: Routes = [
     path: 'mis-viajes',
     component: TripMyListComponent,
     canActivate: [authGuard],
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent,
   },
   {
     path: 'viaje/:id',
@@ -62,12 +71,8 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
-    path: 'foro',
-    component: ForoComponent,
-  },
-  {
-    path: 'foro/:id',
-    component: ForoDetailComponent,
+    path: 'como-funciona',
+    component: HowItWorksComponent,
   },
   {
     path: '**',

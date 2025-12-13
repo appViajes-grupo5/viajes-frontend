@@ -127,7 +127,6 @@ export class AuthService {
       }
     }).pipe(
       tap(response => {
-        // Actualizar el usuario en localStorage y observable
         const updatedUser = {
           id: response.id,
           name: `${response.firstName} ${response.lastName || ''}`.trim(),
@@ -137,6 +136,14 @@ export class AuthService {
         this.currentUserSubject.next(updatedUser);
       })
     );
+  }
+
+  requestPasswordReset(email: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/reset-password`, { token, password });
   }
 }
 

@@ -1,48 +1,75 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe, SlicePipe, Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { RatingsService, Rating } from '../../services/ratings.service';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, DatePipe, SlicePipe],
+  imports: [ReactiveFormsModule, CommonModule, DatePipe, SlicePipe, RouterLink],
   templateUrl: './user-profile.html',
   styleUrls: ['./user-profile.css']
 })
 export class UserProfileComponent implements OnInit {
   profileForm!: FormGroup;
   defaultAvatarUrl = 'assets/images/profile-placeholder.jpg';
-  avatarPreviewUrl: string | null = null; // Para vista previa temporal
+  avatarPreviewUrl: string | null = null;
   isLoading: boolean = false;
   isSaving: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
+  ratings = signal<Rating[]>([]);
+  isLoadingRatings = signal<boolean>(false);
+  currentUserId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
     private location: Location,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private ratingsService: RatingsService
   ) { }
 
   ngOnInit(): void {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.currentUserId = user.id;
+    }
+
     this.profileForm = this.fb.group({
-      // Campos editables según la BD: first_name, last_name, phone, bio, interests, profile_picture_url
       firstName: ['', [Validators.required, Validators.maxLength(100)]],
       lastName: ['', [Validators.maxLength(100)]],
       phone: ['', [Validators.maxLength(25)]],
       bio: ['', [Validators.maxLength(500)]],
       interests: [''],
       profilePictureUrl: [null],
-      // Campos de solo lectura (no editables): email, average_rating, created_at
       email: ['', [Validators.required, Validators.email]],
       averageRating: [0],
       createdAt: [new Date()]
     });
 
     this.loadUserData();
+    if (this.currentUserId) {
+      this.loadRatings();
+    }
+  }
+
+  loadRatings(): void {
+    if (!this.currentUserId) return;
+    
+    this.isLoadingRatings.set(true);
+    this.ratingsService.getRatingsForUser(this.currentUserId).subscribe({
+      next: (ratings) => {
+        this.ratings.set(ratings);
+        this.isLoadingRatings.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargando calificaciones:', err);
+        this.isLoadingRatings.set(false);
+      }
+    });
   }
 
   loadUserData(): void {
