@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:4000/api'
+  production: true,
+  apiUrl: 'https://viajes-backend-u82f.onrender.com/api'
 };
 
