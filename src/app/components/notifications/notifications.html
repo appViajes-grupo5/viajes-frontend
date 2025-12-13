@@ -1,0 +1,110 @@
+<div class="notifications-container position-relative">
+  <button 
+    class="btn btn-link text-white text-decoration-none position-relative p-2"
+    (click)="toggleDropdown()"
+    type="button"
+    [attr.aria-expanded]="isOpen()"
+  >
+    <i class="bi bi-bell fs-5"></i>
+    @if (unreadCount() > 0) {
+      <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill" 
+            style="font-size: 0.65rem; padding: 0.15em 0.4em;">
+        {{ unreadCount() > 99 ? '99+' : unreadCount() }}
+      </span>
+    }
+  </button>
+
+  @if (isOpen()) {
+    <div class="notifications-dropdown shadow-lg">
+      <div class="notifications-header d-flex justify-content-between align-items-center p-3 border-bottom">
+        <h6 class="mb-0 fw-bold">
+          <i class="bi bi-bell-fill me-2"></i>Notificaciones
+        </h6>
+        <div class="d-flex gap-2">
+          @if (unreadCount() > 0) {
+            <button 
+              class="btn btn-sm btn-outline-primary"
+              (click)="markAllAsRead()"
+              title="Marcar todas como leídas"
+            >
+              <i class="bi bi-check-all"></i>
+            </button>
+          }
+          <button 
+            class="btn btn-sm btn-link text-muted p-0"
+            (click)="closeDropdown()"
+            title="Cerrar"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="notifications-body" style="max-height: 400px; overflow-y: auto;">
+        @if (isLoading()) {
+          <div class="text-center p-4">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+        } @else if (notifications().length === 0) {
+          <div class="text-center p-4 text-muted">
+            <i class="bi bi-bell-slash fs-1 d-block mb-2 opacity-50"></i>
+            <p class="mb-0">No tienes notificaciones</p>
+          </div>
+        } @else {
+          @for (notification of notifications(); track notification.notification_id) {
+            <div 
+              class="notification-item p-3 border-bottom cursor-pointer"
+              [class.bg-light]="!notification.is_read"
+              [class.fw-bold]="!notification.is_read"
+              (click)="handleNotificationClick(notification)"
+            >
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  @if (!notification.is_read) {
+                    <span class="badge bg-primary me-2" style="font-size: 0.5rem;">Nuevo</span>
+                  }
+                  <p class="mb-1" [class.text-muted]="notification.is_read">
+                    {{ notification.message }}
+                  </p>
+                  <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i>
+                    {{ notification.created_at | date:'dd/MM/yyyy HH:mm' }}
+                  </small>
+                </div>
+                <div class="d-flex gap-1 ms-2">
+                  @if (!notification.is_read) {
+                    <button 
+                      class="btn btn-sm btn-link text-primary p-1"
+                      (click)="markAsRead(notification, $event)"
+                      title="Marcar como leída"
+                    >
+                      <i class="bi bi-check-circle"></i>
+                    </button>
+                  }
+                  <button 
+                    class="btn btn-sm btn-link text-danger p-1"
+                    (click)="deleteNotification(notification.notification_id, $event)"
+                    title="Eliminar"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      @if (notifications().length > 0) {
+        <div class="notifications-footer p-2 border-top text-center">
+          <small class="text-muted">
+            {{ unreadCount() }} sin leer de {{ notifications().length }} total
+          </small>
+        </div>
+      }
+    </div>
+  }
+</div>
+

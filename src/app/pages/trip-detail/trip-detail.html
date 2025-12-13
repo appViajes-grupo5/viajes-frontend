@@ -1,36 +1,87 @@
 @if (trip) {
 <div class="page-container container py-5">
-
-  <button (click)="goBack()" class="btn btn-link text-decoration-none mb-4 ps-0 text-secondary">
+  <button
+    (click)="goBack()"
+    class="btn btn-link text-decoration-none mb-4 ps-0 text-secondary"
+  >
     <i class="bi bi-arrow-left"></i> Volver al listado
   </button>
 
-  <div class="row shadow rounded-4 overflow-hidden border bg-white">
-
-    <div class="col-lg-6 p-0" style="min-height: 400px;">
-      <img [src]="getImageUrl()" class="w-100 h-100 object-fit-cover" [alt]="trip.title">
+  <div class="row shadow rounded-4 overflow-hidden border bg-white mb-5">
+    <div class="col-lg-6 p-0" style="min-height: 400px">
+      <img
+        [src]="getImageUrl()"
+        class="w-100 h-100 object-fit-cover"
+        [alt]="trip.title"
+      />
     </div>
 
-    <div class="col-lg-6 p-5">
-      <div class="d-flex justify-content-between align-items-start">
+    <div class="col-lg-6 p-4 p-md-5">
+      <div class="d-flex justify-content-between align-items-start mb-2">
         <span class="badge bg-primary mb-3">{{ trip.destination }}</span>
-        <span class="fw-bold text-success fs-4">{{ trip.estimated_cost | currency:'EUR' }}</span>
+        <span class="fw-bold text-success fs-4 d-none d-lg-block"
+          >{{ trip.estimated_cost | currency:'EUR' }}</span
+        >
       </div>
 
       <h1 class="fw-bold mb-3">{{ trip.title }}</h1>
 
-      <div class="d-flex flex-wrap gap-4 text-muted mb-4 small">
-        <span class="d-flex align-items-center">
+      <div
+        class="d-flex align-items-center mb-4 p-3 bg-light rounded border-start border-4 border-info"
+      >
+        <div class="me-3">
+          <div
+            class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center overflow-hidden"
+            style="width: 48px; height: 48px; font-size: 1.5rem"
+          >
+            @if(trip.creator_avatar) {
+            <img
+              [src]="trip.creator_avatar"
+              class="w-100 h-100 object-fit-cover"
+            />
+            } @else {
+            <span>{{ trip.creator_first_name?.charAt(0) | uppercase }}</span>
+            }
+          </div>
+        </div>
+        <div>
+          <div class="fw-bold text-dark lh-1">
+            Organizado por {{ trip.creator_first_name }} {{
+            trip.creator_last_name }}
+          </div>
+
+          @if (isApproved && !isCreator) {
+          <div class="small text-muted mt-2">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-envelope"></i> {{ trip.creator_email }}
+            </div>
+            @if(trip.creator_phone) {
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-telephone"></i> {{ trip.creator_phone }}
+            </div>
+            }
+          </div>
+          } @else if (!isCreator) {
+          <small class="text-muted fst-italic" style="font-size: 0.8rem"
+            >Únete y sé aceptado para ver contacto.</small
+          >
+          }
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-3 text-muted mb-4 small">
+        <span class="d-flex align-items-center bg-light px-2 py-1 rounded">
           <i class="bi bi-calendar3 me-2 text-primary"></i>
-          {{ trip.start_date | date:'dd/MM/yyyy' }} - {{ trip.end_date | date:'dd/MM/yyyy' }}
+          {{ trip.start_date | date:'dd/MM/yyyy' }} - {{ trip.end_date |
+          date:'dd/MM/yyyy' }}
         </span>
 
-        <span class="d-flex align-items-center">
+        <span class="d-flex align-items-center bg-light px-2 py-1 rounded">
           <i class="bi bi-people-fill me-2 text-primary"></i>
-          Mín. {{ trip.min_participants }} personas
+          Mín. {{ trip.min_participants }} pers.
         </span>
 
-        <span class="d-flex align-items-center">
+        <span class="d-flex align-items-center bg-light px-2 py-1 rounded">
           <i class="bi bi-airplane-engines me-2 text-primary"></i>
           {{ trip.transport_details }}
         </span>
@@ -41,66 +92,215 @@
 
       @if (participants.length > 0) {
       <div class="mb-4">
-        <h6 class="fw-bold text-secondary mb-2">Ya se han apuntado:</h6>
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-          @for (p of participants; track $index) {
-          <div class="d-flex flex-column align-items-center" style="width: 50px;">
-            <div
-              class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm"
-              style="width: 40px; height: 40px; font-size: 1.2rem;" [title]="p.firstName">
-              {{ p.firstName?.charAt(0) | uppercase }}
+        <h6 class="fw-bold text-secondary mb-2">Participantes:</h6>
+        <div class="d-flex flex-column gap-2">
+          @for (p of participants; track p.user_id) {
+          <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded">
+            <div class="d-flex align-items-center gap-2">
+              <div
+                class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm"
+                style="width: 40px; height: 40px; font-size: 1.2rem"
+              >
+                {{ p.first_name?.charAt(0) | uppercase }}
+              </div>
+              <div>
+                <div class="fw-bold">{{ p.first_name }} {{ p.last_name || '' }}</div>
+                <small class="text-muted">
+                  @if (p.status === 'approved') {
+                    <span class="badge bg-success">Aceptado</span>
+                  } @else if (p.status === 'pending') {
+                    <span class="badge bg-warning">Pendiente</span>
+                  } @else {
+                    <span class="badge bg-danger">Rechazado</span>
+                  }
+                </small>
+              </div>
             </div>
-            <small class="text-truncate w-100 text-center" style="font-size: 0.7rem;">{{ p.firstName }}</small>
+            @if (isCreator && p.status === 'pending') {
+            <div class="d-flex gap-2">
+              <button
+                (click)="approveParticipant(p.user_id)"
+                class="btn btn-sm btn-success"
+                title="Aceptar"
+              >
+                <i class="bi bi-check-lg"></i>
+              </button>
+              <button
+                (click)="rejectParticipant(p.user_id)"
+                class="btn btn-sm btn-danger"
+                title="Rechazar"
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+            }
           </div>
           }
         </div>
       </div>
       }
 
-      <hr class="my-4 opacity-10">
+      <hr class="my-4 opacity-10" />
 
       <h5 class="fw-bold">Itinerario</h5>
-      <p class="small text-muted bg-light p-3 rounded border-start border-3 border-primary">
+      <p
+        class="small text-muted bg-light p-3 rounded border-start border-3 border-primary"
+      >
         {{ trip.itinerary || 'Itinerario pendiente de confirmar.' }}
       </p>
 
       <div class="mt-4 pt-2 d-flex gap-2 flex-wrap">
-
         @if (!isJoined) {
-        <button (click)="joinTrip()" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
-          <i class="bi bi-check-lg me-1"></i> ¡Me apunto!
-        </button>
+          @if (puedeUnirse()) {
+            <button
+              (click)="joinTrip()"
+              class="btn btn-primary px-4 py-2 rounded-pill shadow-sm"
+            >
+              <i class="bi bi-check-lg me-1"></i> ¡Me apunto!
+            </button>
+          } @else {
+            <button
+              class="btn btn-secondary px-4 py-2 rounded-pill shadow-sm"
+              disabled
+              [title]="tripStatus() === 'ongoing' ? 'El viaje ya ha comenzado' : 'El viaje ya ha finalizado'"
+            >
+              <i class="bi bi-lock me-1"></i>
+              @if (tripStatus() === 'ongoing') {
+                Viaje en curso
+              } @else {
+                Viaje finalizado
+              }
+            </button>
+          }
         } @else {
-        <button (click)="leaveTrip()" class="btn btn-warning px-4 py-2 rounded-pill shadow-sm">
+        <button
+          (click)="leaveTrip()"
+          [disabled]="tripStatus() === 'ongoing' || tripStatus() === 'finished'"
+          class="btn btn-warning px-4 py-2 rounded-pill shadow-sm"
+          [title]="(tripStatus() === 'ongoing' || tripStatus() === 'finished') ? 'No puedes cancelar tu plaza porque el viaje ya comenzó o finalizó' : ''"
+        >
           <i class="bi bi-x-circle me-1"></i> Cancelar plaza
         </button>
-        }
-
-        @if (isCreator) {
-        <a [routerLink]="['/editar-viaje', trip.trip_id]" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+        } @if (isCreator) {
+        <a
+          [routerLink]="['/editar-viaje', trip.trip_id]"
+          class="btn btn-outline-secondary px-4 py-2 rounded-pill"
+        >
           <i class="bi bi-pencil me-1"></i> Editar
         </a>
 
-        <button (click)="deleteTrip()" class="btn btn-outline-danger px-4 py-2 rounded-pill">
+        <button
+          (click)="deleteTrip()"
+          class="btn btn-outline-danger px-4 py-2 rounded-pill"
+        >
           <i class="bi bi-trash me-1"></i> Borrar
         </button>
         }
       </div>
-
     </div>
   </div>
   <div class="mt-5">
-    @if (puedeValorar()) {
-    <app-rating-form [tripId]="trip.trip_id" [ratedUserId]="usuarioAValorarId()">
-    </app-rating-form>
+    @if (isApproved || isCreator) {
+    <app-trip-comments
+      [tripId]="trip.trip_id"
+      [isApproved]="isApproved || isCreator"
+    ></app-trip-comments>
+    }
+  </div>
+
+  <div class="mt-5">
+    @if (tripStatus() === 'upcoming') {
+      <div class="alert alert-info">
+        <i class="bi bi-calendar-event me-2"></i>
+        <strong>Viaje próximo:</strong> Este viaje aún no ha comenzado. Las calificaciones estarán disponibles después de que finalice.
+      </div>
+    } @else if (tripStatus() === 'ongoing') {
+      <div class="alert alert-warning">
+        <i class="bi bi-clock me-2"></i>
+        <strong>Viaje en curso:</strong> Este viaje está actualmente en progreso. Podrás calificar a los participantes una vez que finalice.
+      </div>
+    } @else if (puedeValorar() && usuariosParaValorar().length > 0) {
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="bi bi-star-fill me-2"></i>Calificar Participantes</h5>
+        </div>
+        <div class="card-body">
+          @if (usuariosParaValorar().length > 1) {
+            <div class="mb-3">
+              <label class="form-label fw-bold">Selecciona a quién quieres calificar:</label>
+              <div class="list-group">
+                @for (user of usuariosParaValorar(); track user.user_id) {
+                  <button
+                    type="button"
+                    class="list-group-item list-group-item-action"
+                    [class.active]="selectedUserToRate() === user.user_id"
+                    (click)="selectUserToRate(user.user_id)"
+                  >
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span>
+                        <i class="bi bi-person-circle me-2"></i>
+                        {{ user.first_name }} {{ user.last_name }}
+                        @if (user.isCreator) {
+                          <span class="badge bg-primary ms-2">Creador</span>
+                        }
+                      </span>
+                      @if (selectedUserToRate() === user.user_id) {
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                      }
+                    </div>
+                  </button>
+                }
+              </div>
+            </div>
+          } @else if (usuariosParaValorar().length === 1) {
+            <div class="mb-3">
+              <p class="text-muted">
+                <i class="bi bi-info-circle me-2"></i>
+                Calificando a: <strong>{{ usuariosParaValorar()[0].first_name }} {{ usuariosParaValorar()[0].last_name }}</strong>
+                @if (usuariosParaValorar()[0].isCreator) {
+                  <span class="badge bg-primary ms-2">Creador</span>
+                }
+              </p>
+            </div>
+          }
+          
+          @if (selectedUserToRate() && !isRefreshingRatings()) {
+            <app-rating-form
+              [tripId]="trip.trip_id"
+              [ratedUserId]="selectedUserToRate()!"
+              [onRatingSubmitted]="onRatingSubmitted"
+            ></app-rating-form>
+          } @else if (isRefreshingRatings()) {
+            <div class="text-center py-3">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Actualizando...</span>
+              </div>
+              <p class="text-muted mt-2 mb-0">Actualizando lista...</p>
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (tripStatus() === 'finished' && isApproved && !puedeValorar() && usuariosParaValorar().length === 0) {
+      <div class="alert alert-success">
+        <i class="bi bi-check-circle me-2"></i>
+        <strong>¡Gracias!</strong> Ya has calificado a todos los participantes disponibles de este viaje.
+      </div>
     }
   </div>
 </div>
+
 } @else {
 <div class="page-container container py-5 text-center mt-5">
-  <div class="display-1 text-muted mb-3"><i class="bi bi-geo-alt"></i></div>
-  <h2 class="fw-bold">Viaje no encontrado</h2>
+  <div class="display-1 text-muted mb-3">
+    <i class="bi bi-geo-alt-fill opacity-25"></i>
+  </div>
+  <h2 class="fw-bold text-secondary">Viaje no encontrado</h2>
   <p class="text-muted">Parece que este viaje no existe o ha sido eliminado.</p>
-  <button (click)="goBack()" class="btn btn-primary mt-3 rounded-pill px-4">Volver a Inicio</button>
+  <button
+    (click)="goBack()"
+    class="btn btn-primary mt-3 rounded-pill px-4 shadow-sm"
+  >
+    <i class="bi bi-house-door me-2"></i>Volver a Inicio
+  </button>
 </div>
 }

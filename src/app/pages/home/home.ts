@@ -8,11 +8,9 @@ import { Trip } from '../../models/trip.interface';
 @Component({
   selector: 'app-home',
   standalone: true,
-  // IMPORTANTE: Aquí declaramos qué usa este componente
   imports: [CommonModule, RouterLink, TripCardComponent],
   templateUrl: './home.html',
   styles: [`
-    /* Un pequeño estilo para el header si no usas clases de Bootstrap puras */
     .hero-section {
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }
@@ -21,14 +19,17 @@ import { Trip } from '../../models/trip.interface';
 export class HomeComponent implements OnInit {
   tripService = inject(TripService);
   trips = signal<Trip[]>([]);
+  isLoading = signal<boolean>(true);
 
   ngOnInit() {
-    this.tripService.getTrips().subscribe({
+    this.tripService.getTrips(undefined, 1, 6).subscribe({
       next: (data) => {
-        this.trips.set(data);
+        this.trips.set(data.trips || []);
+        this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Error cargando viajes', err);
+        this.isLoading.set(false);
       }
     });
   }

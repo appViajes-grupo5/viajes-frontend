@@ -1,233 +1,338 @@
-<div class="page-container py-5">
-  <div class="container">
+<div class="profile-page">
+  <div class="profile-hero-section">
+    <div class="container">
+      <div class="profile-hero-content">
+        <div class="profile-avatar-large">
+          <img
+            [src]="avatarPreviewUrl || profileForm.get('profilePictureUrl')?.value || defaultAvatarUrl"
+            alt="Foto de perfil"
+            class="avatar-img"
+          />
+        </div>
+        <div class="profile-hero-info">
+          <h1 class="profile-name">
+            {{ profileForm.get('firstName')?.value }} {{ profileForm.get('lastName')?.value }}
+          </h1>
+          <div class="profile-stats">
+            <div class="stat-badge">
+              <i class="bi bi-star-fill text-warning"></i>
+              <span class="stat-value">{{ profileForm.get('averageRating')?.value || '0.00' }}</span>
+              <span class="stat-label">Valoración</span>
+            </div>
+            <div class="stat-badge">
+              <i class="bi bi-calendar-check text-primary"></i>
+              <span class="stat-value">{{ profileForm.get('createdAt')?.value | date:'yyyy' }}</span>
+              <span class="stat-label">Miembro desde</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container py-5">
     <div class="row g-4">
-      <!-- COLUMNA IZQUIERDA: Tarjeta de Resumen (Datos de la tabla 'users') -->
       <div class="col-lg-4">
-        <div class="card shadow-sm border-0 rounded-lg text-center p-4 h-100">
-          <!-- CAMPO: profile_picture_url -->
-          <div class="profile-img-container mx-auto mb-3">
-            <img
-              [src]="avatarPreviewUrl || profileForm.get('profilePictureUrl')?.value || defaultAvatarUrl"
-              alt="Foto de perfil"
-              class="img-fluid rounded-circle profile-img shadow-sm"
-            />
+        <div class="profile-sidebar-card">
+          <div class="sidebar-section">
+            <h6 class="sidebar-title">
+              <i class="bi bi-person-circle me-2"></i>Biografía
+            </h6>
+            <p class="sidebar-content">
+              {{ profileForm.get('bio')?.value || 'Sin biografía' }}
+            </p>
           </div>
 
-          <!-- CAMPO: first_name y last_name -->
-          <h4 class="fw-bold mb-1">
-            {{ profileForm.get('firstName')?.value }} {{
-            profileForm.get('lastName')?.value }}
-          </h4>
-
-          <!-- CAMPO: bio (Vista previa corta) -->
-          <p class="text-muted mb-3 small">
-            {{ (profileForm.get('bio')?.value | slice:0:50) || 'Sin biografía'
-            }}...
-          </p>
-
-          <hr class="my-3" />
-
-          <div class="d-flex justify-content-around text-center mb-3">
-            <div>
-              <!-- CAMPO: average_rating (Solo lectura, viene de la BD) -->
-              <h5 class="fw-bold mb-0 text-primary">
-                <i class="bi bi-star-fill text-warning"></i>
-                {{ profileForm.get('averageRating')?.value || '0.00' }}
-              </h5>
-              <small class="text-muted">Valoración</small>
+          @if (profileForm.get('interests')?.value) {
+            <div class="sidebar-section">
+              <h6 class="sidebar-title">
+                <i class="bi bi-heart-fill me-2 text-danger"></i>Intereses
+              </h6>
+              <div class="interests-list">
+                @for (interest of (profileForm.get('interests')?.value?.split(',') || []); track interest) {
+                  <span class="interest-badge">{{ interest.trim() }}</span>
+                }
+              </div>
             </div>
-            <div>
-              <!-- CAMPO: created_at (Solo lectura) -->
-              <h5 class="fw-bold mb-0 text-primary">
-                {{ profileForm.get('createdAt')?.value | date:'yyyy' }}
-              </h5>
-              <small class="text-muted">Miembro desde</small>
-            </div>
-          </div>
+          }
 
-          <div class="d-grid gap-2">
-            <button class="btn btn-outline-danger border-0" (click)="logout()">
+          <div class="sidebar-section">
+            <button class="btn btn-outline-danger w-100" (click)="logout()">
               <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
             </button>
           </div>
         </div>
       </div>
 
-      <!-- COLUMNA DERECHA: Formulario de Edición -->
       <div class="col-lg-8">
-        <div class="card shadow-sm border-0 rounded-lg h-100">
-          <div class="card-header bg-white border-0 py-3">
-            <h5 class="mb-0 fw-bold text-primary">
-              Editar Información Personal
-            </h5>
+        <div class="profile-edit-card">
+          <div class="card-header-modern">
+            <div class="d-flex align-items-center">
+              <div class="header-icon-modern me-3">
+                <i class="bi bi-person-gear"></i>
+              </div>
+              <div>
+                <h4 class="mb-0 fw-bold">Editar Perfil</h4>
+                <small class="text-muted">Actualiza tu información personal</small>
+              </div>
+            </div>
           </div>
-          <div class="card-body p-4">
+
+          <div class="card-body-modern">
             @if (isLoading) {
-            <div class="text-center py-5">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
+              <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3 text-muted">Cargando datos del perfil...</p>
               </div>
-              <p class="mt-3 text-muted">Cargando datos del perfil...</p>
-            </div>
-            } @else { @if (errorMessage) {
-            <div class="alert alert-danger" role="alert">
-              {{ errorMessage }}
-            </div>
-            } @if (successMessage) {
-            <div class="alert alert-success" role="alert">
-              {{ successMessage }}
-            </div>
+            } @else {
+              @if (errorMessage) {
+                <div class="alert alert-danger" role="alert">
+                  <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+                </div>
+              }
+              @if (successMessage) {
+                <div class="alert alert-success" role="alert">
+                  <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
+                </div>
+              }
+
+              <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="firstName" class="form-label-modern">
+                      <i class="bi bi-person me-1"></i>NOMBRE
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control-modern"
+                      id="firstName"
+                      formControlName="firstName"
+                      placeholder="Tu nombre"
+                    />
+                    @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
+                      <div class="form-error">El nombre es obligatorio.</div>
+                    }
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="lastName" class="form-label-modern">
+                      <i class="bi bi-person-badge me-1"></i>APELLIDOS
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control-modern"
+                      id="lastName"
+                      formControlName="lastName"
+                      placeholder="Tus apellidos"
+                    />
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="phone" class="form-label-modern">
+                      <i class="bi bi-telephone me-1"></i>TELÉFONO
+                    </label>
+                    <input
+                      type="tel"
+                      class="form-control-modern"
+                      id="phone"
+                      formControlName="phone"
+                      placeholder="Ej: +34 600 123 456"
+                      maxlength="25"
+                    />
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="email" class="form-label-modern">
+                      <i class="bi bi-envelope me-1"></i>EMAIL
+                    </label>
+                    <input
+                      type="email"
+                      class="form-control-modern bg-light"
+                      id="email"
+                      formControlName="email"
+                      readonly
+                    />
+                    <div class="form-help">El email no se puede cambiar.</div>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="bio" class="form-label-modern">
+                      <i class="bi bi-file-text me-1"></i>BIOGRAFÍA
+                    </label>
+                    <textarea
+                      class="form-control-modern"
+                      id="bio"
+                      rows="4"
+                      formControlName="bio"
+                      placeholder="Cuéntanos algo sobre ti..."
+                    ></textarea>
+                    <div class="form-help text-end">
+                      {{ profileForm.get('bio')?.value?.length || 0 }}/500 caracteres
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="interests" class="form-label-modern">
+                      <i class="bi bi-heart me-1"></i>INTERESES DE VIAJE
+                    </label>
+                    <textarea
+                      class="form-control-modern"
+                      id="interests"
+                      rows="3"
+                      formControlName="interests"
+                      placeholder="Ej: Senderismo, Gastronomía, Museos..."
+                    ></textarea>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="profilePictureUrl" class="form-label-modern">
+                      <i class="bi bi-image me-1"></i>URL DE FOTO DE PERFIL
+                    </label>
+                    <input
+                      type="url"
+                      class="form-control-modern"
+                      id="profilePictureUrl"
+                      formControlName="profilePictureUrl"
+                      (input)="onUrlChange()"
+                      placeholder="https://ejemplo.com/mi-foto.jpg"
+                    />
+                    <div class="form-help">
+                      <i class="bi bi-info-circle me-1"></i>
+                      Ingresa la URL de tu foto de perfil.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn btn-light" (click)="goBack()">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="profileForm.invalid || profileForm.pristine || isSaving"
+                  >
+                    @if (isSaving) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                      Guardando...
+                    } @else {
+                      <i class="bi bi-check-circle me-1"></i>Guardar Cambios
+                    }
+                  </button>
+                </div>
+              </form>
             }
+          </div>
+        </div>
 
-            <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-              <div class="row g-3">
-                <!-- CAMPO: first_name (varchar 100) -->
-                <div class="col-md-6">
-                  <label
-                    for="firstName"
-                    class="form-label small fw-bold text-muted"
-                    >NOMBRE</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="firstName"
-                    formControlName="firstName"
-                  />
-                  @if (profileForm.get('firstName')?.invalid &&
-                  profileForm.get('firstName')?.touched) {
-                  <div class="text-danger small mt-1">
-                    El nombre es obligatorio.
+        <div class="ratings-section-card">
+          <div class="ratings-header-modern">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center">
+                <div class="ratings-header-icon me-3">
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <div>
+                  <h4 class="mb-0 fw-bold text-white">Calificaciones Recibidas</h4>
+                  <small class="text-white-50">
+                    {{ ratings().length }} calificación{{ ratings().length !== 1 ? 'es' : '' }} recibida{{ ratings().length !== 1 ? 's' : '' }}
+                  </small>
+                </div>
+              </div>
+              @if (ratings().length > 0) {
+                <div class="average-rating-badge">
+                  <span class="rating-number">{{ profileForm.get('averageRating')?.value || '0.00' }}</span>
+                  <i class="bi bi-star-fill ms-1"></i>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="ratings-body">
+            @if (isLoadingRatings()) {
+              <div class="text-center py-5">
+                <div class="spinner-border text-warning" role="status" style="width: 3rem; height: 3rem;">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3 text-muted">Cargando calificaciones...</p>
+              </div>
+            } @else if (ratings().length === 0) {
+              <div class="empty-ratings-state text-center py-5">
+                <div class="empty-star-icon mb-4">
+                  <i class="bi bi-star"></i>
+                </div>
+                <h5 class="fw-bold text-muted mb-2">Aún no tienes calificaciones</h5>
+                <p class="text-muted mb-0">
+                  Las calificaciones aparecerán aquí cuando otros usuarios te valoren después de un viaje.
+                </p>
+              </div>
+            } @else {
+              <div class="ratings-list">
+                @for (rating of ratings(); track rating.rating_id) {
+                  <div class="rating-item-card">
+                    <div class="rating-avatar-section">
+                      @if (rating.rater_profile_picture_url) {
+                        <img
+                          [src]="rating.rater_profile_picture_url"
+                          class="rating-avatar-img"
+                          [alt]="rating.rater_first_name"
+                        />
+                      } @else {
+                        <div class="rating-avatar-placeholder">
+                          {{ rating.rater_first_name?.charAt(0) | uppercase }}
+                        </div>
+                      }
+                      <div class="rating-badge-number">{{ rating.rating_value }}</div>
+                    </div>
+                    <div class="rating-content-section">
+                      <div class="rating-header-info">
+                        <div>
+                          <h6 class="rating-author-name mb-1">
+                            {{ rating.rater_first_name }} {{ rating.rater_last_name || '' }}
+                          </h6>
+                          <div class="rating-meta">
+                            <span class="rating-date">
+                              <i class="bi bi-calendar3 me-1"></i>
+                              {{ rating.created_at | date:'dd/MM/yyyy' }}
+                            </span>
+                            @if (rating.trip_title) {
+                              <span class="rating-separator">•</span>
+                              <span class="rating-trip-info">
+                                <i class="bi bi-airplane me-1"></i>
+                                {{ rating.trip_title }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                        <div class="rating-stars-display">
+                          @for (star of [1,2,3,4,5]; track star) {
+                            <i
+                              class="bi rating-star"
+                              [class.bi-star-fill]="star <= rating.rating_value"
+                              [class.bi-star]="star > rating.rating_value"
+                              [class.star-filled]="star <= rating.rating_value"
+                            ></i>
+                          }
+                        </div>
+                      </div>
+                      @if (rating.trip_destination) {
+                        <div class="rating-trip-badge">
+                          <i class="bi bi-geo-alt-fill me-1"></i>
+                          {{ rating.trip_destination }}
+                        </div>
+                      }
+                      @if (rating.comment) {
+                        <div class="rating-comment-box">
+                          <i class="bi bi-quote rating-quote-icon"></i>
+                          <p class="rating-comment-text mb-0">{{ rating.comment }}</p>
+                        </div>
+                      }
+                    </div>
                   </div>
-                  }
-                </div>
-
-                <!-- CAMPO: last_name (varchar 100) -->
-                <div class="col-md-6">
-                  <label
-                    for="lastName"
-                    class="form-label small fw-bold text-muted"
-                    >APELLIDOS</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="lastName"
-                    formControlName="lastName"
-                  />
-                </div>
-
-                <!-- CAMPO: phone (varchar 25) -->
-                <div class="col-md-6">
-                  <label for="phone" class="form-label small fw-bold text-muted"
-                    >TELÉFONO</label
-                  >
-                  <input
-                    type="tel"
-                    class="form-control"
-                    id="phone"
-                    formControlName="phone"
-                    placeholder="Ej: +34 600 123 456"
-                    maxlength="25"
-                  />
-                </div>
-
-                <!-- CAMPO: email (varchar 255) - SOLO LECTURA (no editable) -->
-                <div class="col-md-6">
-                  <label for="email" class="form-label small fw-bold text-muted"
-                    >EMAIL</label
-                  >
-                  <input
-                    type="email"
-                    class="form-control bg-light"
-                    id="email"
-                    formControlName="email"
-                    readonly
-                  />
-                  <div class="form-text">El email no se puede cambiar.</div>
-                </div>
-
-                <!-- CAMPO: bio (text) -->
-                <div class="col-12">
-                  <label for="bio" class="form-label small fw-bold text-muted"
-                    >BIOGRAFÍA</label
-                  >
-                  <textarea
-                    class="form-control"
-                    id="bio"
-                    rows="4"
-                    formControlName="bio"
-                    placeholder="Cuéntanos algo sobre ti..."
-                  ></textarea>
-                  <div class="form-text text-end">
-                    {{ profileForm.get('bio')?.value?.length || 0 }}/500
-                    caracteres
-                  </div>
-                </div>
+                }
               </div>
-
-              <!-- CAMPO: interests (text) -->
-              <div class="col-12">
-                <label
-                  for="interests"
-                  class="form-label small fw-bold text-muted"
-                  >INTERESES DE VIAJE</label
-                >
-                <textarea
-                  class="form-control"
-                  id="interests"
-                  rows="3"
-                  formControlName="interests"
-                  placeholder="Ej: Senderismo, Gastronomía, Museos..."
-                ></textarea>
-              </div>
-
-              <!-- CAMPO: profile_picture_url (varchar 255) - URL de la imagen -->
-              <div class="col-12">
-                <label
-                  for="profilePictureUrl"
-                  class="form-label small fw-bold text-muted"
-                  >URL DE FOTO DE PERFIL</label
-                >
-                <input
-                  type="url"
-                  class="form-control"
-                  id="profilePictureUrl"
-                  formControlName="profilePictureUrl"
-                  (input)="onUrlChange()"
-                  placeholder="https://ejemplo.com/mi-foto.jpg"
-                />
-                <div class="form-text">
-                  <i class="bi bi-info-circle me-1"></i>
-                  Ingresa la URL de tu foto de perfil.
-                </div>
-              </div>
-
-              <hr class="my-4" />
-
-              <div class="d-flex justify-content-end gap-2">
-                <button
-                  type="button"
-                  class="btn btn-light text-muted"
-                  (click)="goBack()"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  class="btn btn-primary px-4"
-                  [disabled]="profileForm.invalid || profileForm.pristine || isSaving"
-                >
-                  @if (isSaving) {
-                  <span
-                    class="spinner-border spinner-border-sm me-2"
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                  Guardando... } @else { Guardar Cambios }
-                </button>
-              </div>
-            </form>
             }
           </div>
         </div>

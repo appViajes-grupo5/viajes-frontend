@@ -1,0 +1,98 @@
+<div class="trip-comments-container mt-4">
+  <h5 class="fw-bold mb-3">
+    <i class="bi bi-chat-dots me-2"></i>Comentarios del Viaje
+  </h5>
+
+  @if (!isApproved) {
+  <div class="alert alert-warning">
+    <i class="bi bi-lock me-2"></i>
+    <strong>Acceso restringido:</strong> Debes ser participante aceptado o el creador del viaje para ver y escribir comentarios.
+  </div>
+  } @else {
+  <div class="mb-4">
+    <form (ngSubmit)="onSubmit()" class="mb-3">
+      <div class="input-group">
+        <textarea
+          class="form-control"
+          rows="3"
+          placeholder="Escribe un comentario..."
+          [value]="newComment()"
+          (input)="newComment.set($any($event.target).value)"
+          [disabled]="!isApproved"
+        ></textarea>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="!newComment().trim() || !isApproved"
+        >
+          <i class="bi bi-send me-1"></i>Enviar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  @if (isLoading()) {
+  <div class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+  } @else if (comments().length === 0) {
+  <div class="alert alert-light text-center">
+    <i class="bi bi-chat-left-text me-2"></i>
+    No hay comentarios aún. ¡Sé el primero en comentar!
+  </div>
+  } @else {
+  <div class="comments-list">
+    @for (comment of comments(); track comment.comment_id) {
+    <div class="comment-item card mb-3 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-start">
+          <div class="comment-avatar me-3">
+            @if (comment.profile_picture_url) {
+            <img
+              [src]="comment.profile_picture_url"
+              class="rounded-circle"
+              style="width: 40px; height: 40px; object-fit: cover;"
+              [alt]="comment.first_name"
+            />
+            } @else {
+            <div
+              class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
+              style="width: 40px; height: 40px; font-size: 1.2rem"
+            >
+              {{ comment.first_name?.charAt(0) | uppercase }}
+            </div>
+            }
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <strong class="text-dark">
+                  {{ comment.first_name }} {{ comment.last_name || '' }}
+                </strong>
+                <small class="text-muted ms-2">
+                  {{ comment.created_at | date:'dd/MM/yyyy HH:mm' }}
+                </small>
+              </div>
+              @if (canEdit(comment)) {
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="deleteComment(comment.comment_id)"
+                title="Eliminar comentario"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+              }
+            </div>
+            <p class="mb-0 text-dark">{{ comment.comment_text }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+  }
+</div>
+
