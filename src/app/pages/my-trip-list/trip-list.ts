@@ -61,7 +61,34 @@ export class TripMyListComponent implements OnInit {
   abrirModalEditarTrip(idTrip: number) {
     this.selectTrip = idTrip;
   }
+  
+  deleteTrip(idTrip: number) {
+  if (!idTrip) return;
 
+  const confirmDelete = confirm('¿Seguro que deseas eliminar este viaje?');
+  if (!confirmDelete) return;
+
+  this.tripService.deleteTrip(idTrip).subscribe({
+    next: () => {
+      this.trips = this.trips.filter(t => t.trip_id !== idTrip);
+
+      if (this.selectTrip === idTrip) {
+        this.selectTrip = null;
+
+        const modalEl = document.getElementById('modalViaje');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        modalInstance?.hide();
+      }
+
+      alert('Viaje eliminado correctamente.');
+    },
+    error: (err) => {
+      console.error('Error al eliminar viaje', err);
+      const msg = err?.error?.message || 'Hubo un error al eliminar el viaje.';
+      alert(msg);
+    }
+  });
+}
   getImageUrl(trip: Trip): string {
     return getTripImageUrl(trip);
   }
@@ -70,4 +97,6 @@ export class TripMyListComponent implements OnInit {
     const d = new Date(date);
     return d.toLocaleDateString();
   }
+  
+
 }
