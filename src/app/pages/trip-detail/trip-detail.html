@@ -5,35 +5,71 @@
     <i class="bi bi-arrow-left"></i> Volver al listado
   </button>
 
-  <div class="row shadow rounded-4 overflow-hidden border bg-white">
+  <div class="row shadow rounded-4 overflow-hidden border bg-white mb-5">
 
-    <div class="col-lg-6 p-0" style="min-height: 400px;">
+    <div class="col-lg-6 p-0 position-relative" style="min-height: 400px;">
       <img 
         [src]="getImageUrl()" 
         class="w-100 h-100 object-fit-cover" 
         [alt]="trip.title">
+        
+      <div class="position-absolute top-0 end-0 m-3 d-lg-none">
+         <span class="badge bg-success fs-5 shadow">{{ trip.estimated_cost | currency:'EUR' }}</span>
+      </div>
     </div>
 
-    <div class="col-lg-6 p-5">
-      <div class="d-flex justify-content-between align-items-start">
+    <div class="col-lg-6 p-4 p-md-5">
+      
+      <div class="d-flex justify-content-between align-items-start mb-2">
         <span class="badge bg-primary mb-3">{{ trip.destination }}</span>
-        <span class="fw-bold text-success fs-4">{{ trip.estimated_cost | currency:'EUR' }}</span>
+        <span class="fw-bold text-success fs-4 d-none d-lg-block">{{ trip.estimated_cost | currency:'EUR' }}</span>
       </div>
 
       <h1 class="fw-bold mb-3">{{ trip.title }}</h1>
 
-      <div class="d-flex flex-wrap gap-4 text-muted mb-4 small">
-        <span class="d-flex align-items-center">
+      <div class="d-flex align-items-center mb-4 p-3 bg-light rounded border-start border-4 border-info">
+        <div class="me-3">
+            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center overflow-hidden" 
+                 style="width: 48px; height: 48px; font-size: 1.5rem;">
+                @if(trip.creator_avatar) {
+                    <img [src]="trip.creator_avatar" class="w-100 h-100 object-fit-cover">
+                } @else {
+                    <span>{{ trip.creator_first_name?.charAt(0) | uppercase }}</span>
+                }
+            </div>
+        </div>
+        <div>
+            <div class="fw-bold text-dark lh-1">Organizado por {{ trip.creator_first_name }} {{ trip.creator_last_name }}</div>
+            
+            @if (isApproved && !isCreator) {
+                <div class="small text-muted mt-2">
+                    <div class="d-flex align-items-center gap-2">
+                         <i class="bi bi-envelope"></i> {{ trip.creator_email }}
+                    </div>
+                    @if(trip.creator_phone) { 
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-telephone"></i> {{ trip.creator_phone }} 
+                        </div>
+                    }
+                </div>
+            } @else if (!isCreator) {
+                <small class="text-muted fst-italic" style="font-size: 0.8rem;">Únete y sé aceptado para ver contacto.</small>
+            }
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-3 text-muted mb-4 small">
+        <span class="d-flex align-items-center bg-light px-2 py-1 rounded">
           <i class="bi bi-calendar3 me-2 text-primary"></i>
           {{ trip.start_date | date:'dd/MM/yyyy' }} - {{ trip.end_date | date:'dd/MM/yyyy' }}
         </span>
 
-        <span class="d-flex align-items-center">
+        <span class="d-flex align-items-center bg-light px-2 py-1 rounded">
           <i class="bi bi-people-fill me-2 text-primary"></i>
-          Mín. {{ trip.min_participants }} personas
+          Mín. {{ trip.min_participants }} pers.
         </span>
 
-        <span class="d-flex align-items-center">
+        <span class="d-flex align-items-center bg-light px-2 py-1 rounded">
           <i class="bi bi-airplane-engines me-2 text-primary"></i>
           {{ trip.transport_details }}
         </span>
@@ -44,16 +80,34 @@
 
       @if (participants.length > 0) {
         <div class="mb-4">
-          <h6 class="fw-bold text-secondary mb-2">Ya se han apuntado:</h6>
+          <h6 class="fw-bold text-secondary mb-2">Compañeros de viaje ({{ participants.length }}):</h6>
           <div class="d-flex align-items-center gap-2 flex-wrap">
             @for (p of participants; track $index) {
-              <div class="d-flex flex-column align-items-center" style="width: 50px;">
-                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm" 
+              <div class="d-flex flex-column align-items-center position-relative" style="width: 60px;">
+                
+                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm position-relative overflow-hidden" 
                      style="width: 40px; height: 40px; font-size: 1.2rem;" 
-                     [title]="p.firstName">
-                  {{ p.firstName?.charAt(0) | uppercase }}
+                     [title]="p.first_name + ' ' + (p.last_name || '')">
+                  
+                  @if(p.profile_picture_url) {
+                    <img [src]="p.profile_picture_url" class="w-100 h-100 object-fit-cover">
+                  } @else {
+                    {{ p.first_name?.charAt(0) | uppercase }}
+                  }
+
+                  @if (p.status === 'approved' || p.status === 'accepted') {
+                    <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle" 
+                          style="width: 10px; height: 10px; transform: translate(-2px, -2px);"></span>
+                  }
                 </div>
-                <small class="text-truncate w-100 text-center" style="font-size: 0.7rem;">{{ p.firstName }}</small>
+
+                <small class="text-truncate w-100 text-center mt-1" style="font-size: 0.7rem;">{{ p.first_name }}</small>
+                
+                @if (isCreator && (p.status === 'approved' || p.status === 'accepted')) {
+                    <small class="text-muted" style="font-size: 0.6rem;">
+                        <i class="bi bi-telephone-fill"></i>
+                    </small>
+                }
               </div>
             }
           </div>
@@ -69,41 +123,67 @@
 
       <div class="mt-4 pt-2 d-flex gap-2 flex-wrap">
         
-        @if (!isJoined) {
-          <button (click)="joinTrip()" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
-            <i class="bi bi-check-lg me-1"></i> ¡Me apunto!
-          </button>
-        } @else {
-          <button (click)="leaveTrip()" class="btn btn-warning px-4 py-2 rounded-pill shadow-sm">
-            <i class="bi bi-x-circle me-1"></i> Cancelar plaza
-          </button>
+        @if (isCreator) {
+            <a [routerLink]="['/editar-viaje', trip.trip_id]" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+                <i class="bi bi-pencil me-1"></i> Editar Viaje
+            </a>
+
+            <button (click)="deleteTrip()" class="btn btn-outline-danger px-4 py-2 rounded-pill">
+                <i class="bi bi-trash me-1"></i> Borrar Viaje
+            </button>
+        } 
+        
+        @else {
+            @if (!isJoined) {
+                <button (click)="joinTrip()" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
+                    <i class="bi bi-check-lg me-1"></i> ¡Me apunto!
+                </button>
+            } @else {
+                <div class="d-flex align-items-center gap-3 bg-light p-2 rounded-pill border">
+                    <span class="badge rounded-pill px-3 py-2" 
+                        [class.bg-warning]="!isApproved" 
+                        [class.text-dark]="!isApproved"
+                        [class.bg-success]="isApproved">
+                        <i class="bi" [class.bi-hourglass-split]="!isApproved" [class.bi-check-circle-fill]="isApproved"></i>
+                        {{ isApproved ? 'Plaza Confirmada' : 'Solicitud Pendiente' }}
+                    </span>
+                    
+                    <button (click)="leaveTrip()" class="btn btn-sm btn-outline-danger rounded-circle" title="Cancelar plaza/salir" style="width: 32px; height: 32px; padding: 0;">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            }
         }
-
-        <a [routerLink]="['/editar-viaje', trip.trip_id]" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
-          <i class="bi bi-pencil me-1"></i> Editar
-        </a>
-
-        <button (click)="deleteTrip()" class="btn btn-outline-danger px-4 py-2 rounded-pill">
-          <i class="bi bi-trash me-1"></i> Borrar
-        </button>
       </div>
 
     </div>
   </div>
-  <div class="mt-5">
-  @if (puedeValorar()) {
-    <app-rating-form
-      [tripId]="trip.trip_id"
-      [ratedUserId]="usuarioAValorarId()">
-    </app-rating-form>
-  }
+
+  <div class="mt-5 d-flex justify-content-center">
+    @if (puedeValorar()) {
+        <div class="w-100" style="max-width: 600px;">
+            <div class="alert alert-info text-center mb-4 shadow-sm border-0 border-start border-5 border-info">
+                <h5 class="alert-heading fw-bold"><i class="bi bi-stars text-warning me-2"></i>¡El viaje ha finalizado!</h5>
+                <p class="mb-0">Esperamos que lo hayas pasado genial. ¿Qué tal fue la experiencia con el organizador?</p>
+            </div>
+            
+            <app-rating-form
+                [tripId]="trip.trip_id"
+                [ratedUserId]="usuarioAValorarId()">
+            </app-rating-form>
+        </div>
+    }
+  </div>
+
 </div>
-</div>
+
 } @else {
 <div class="page-container container py-5 text-center mt-5">
-  <div class="display-1 text-muted mb-3"><i class="bi bi-geo-alt"></i></div>
-  <h2 class="fw-bold">Viaje no encontrado</h2>
+  <div class="display-1 text-muted mb-3"><i class="bi bi-geo-alt-fill opacity-25"></i></div>
+  <h2 class="fw-bold text-secondary">Viaje no encontrado</h2>
   <p class="text-muted">Parece que este viaje no existe o ha sido eliminado.</p>
-  <button (click)="goBack()" class="btn btn-primary mt-3 rounded-pill px-4">Volver a Inicio</button>
+  <button (click)="goBack()" class="btn btn-primary mt-3 rounded-pill px-4 shadow-sm">
+    <i class="bi bi-house-door me-2"></i>Volver a Inicio
+  </button>
 </div>
 }
