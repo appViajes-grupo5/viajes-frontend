@@ -18,6 +18,14 @@
               </div>
             }
 
+            <!-- Mensaje de éxito -->
+            @if (successMessage) {
+              <div class="alert alert-success" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                {{ successMessage }}
+              </div>
+            }
+
             <!-- Tu formulario reactivo (este código ya lo tenías) -->
             <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 

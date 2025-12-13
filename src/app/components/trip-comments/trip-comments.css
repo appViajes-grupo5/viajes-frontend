@@ -1,0 +1,20 @@
+.trip-comments-container {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.comment-item {
+  border: none;
+  transition: transform 0.2s;
+}
+
+.comment-item:hover {
+  transform: translateY(-2px);
+}
+
+.comment-avatar img,
+.comment-avatar div {
+  flex-shrink: 0;
+}
+

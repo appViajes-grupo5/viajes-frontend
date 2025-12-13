@@ -36,6 +36,7 @@ export class RegisterComponent implements OnInit {
 
   showPassword = false;
   errorMessage: string = '';
+  successMessage: string = '';
   isLoading: boolean = false;
 
   constructor(
@@ -85,6 +86,7 @@ export class RegisterComponent implements OnInit {
     }
 
     this.errorMessage = '';
+    this.successMessage = '';
     this.isLoading = true;
 
     const formValue = this.registerForm.value;
@@ -103,7 +105,8 @@ export class RegisterComponent implements OnInit {
         next: (response) => {
           this.isLoading = false;
           console.log('Registro exitoso:', response);
-          this.router.navigate(['/viajes']);
+          this.successMessage = `¡Registro exitoso! Se ha enviado un email de confirmación a ${formValue.registerEmail} con tus credenciales y un enlace para confirmar tu cuenta. Por favor, revisa tu correo y confirma tu cuenta antes de iniciar sesión.`;
+          // No redirigir automáticamente, el usuario debe confirmar primero
         },
         error: (error) => {
           this.isLoading = false;

@@ -4,20 +4,28 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Rating {
-  id: number;
+  rating_id?: number;
+  id?: number;
   trip_id: number;
-  user_id: number;        // usuario que realiza la valoracion
-  rated_user_id: number;  // usuario valorado
-  score: number;
-  comment: string;
+  user_id?: number;
+  rater_user_id?: number;
+  rated_user_id: number;
+  score?: number;
+  rating_value: number;
+  comment?: string;
   created_at: string;
+  rater_first_name?: string;
+  rater_last_name?: string;
+  rater_profile_picture_url?: string;
+  trip_title?: string;
+  trip_destination?: string;
 }
 
 export interface CreateRatingDto {
   trip_id: number;
   rated_user_id: number;
-  score: number;
-  comment: string;
+  rating_value: number;
+  comment?: string;
 }
 
 @Injectable({

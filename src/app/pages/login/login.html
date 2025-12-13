@@ -10,6 +10,14 @@
 
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
+              <!-- Mensaje de éxito -->
+              @if (successMessage) {
+                <div class="alert alert-success" role="alert">
+                  <i class="bi bi-check-circle me-2"></i>
+                  {{ successMessage }}
+                </div>
+              }
+
               <!-- Mensaje de error -->
               @if (errorMessage) {
                 <div class="alert alert-danger" role="alert">
@@ -60,6 +68,12 @@
                 }
               </button>
             </form>
+
+            <div class="text-center mt-3">
+              <a routerLink="/forgot-password" class="text-decoration-none">
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
 
           </div>
         </div>

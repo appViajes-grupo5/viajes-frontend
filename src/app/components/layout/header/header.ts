@@ -1,15 +1,15 @@
 // PASO 1: Importar las herramientas
 import { Component, HostListener, HostBinding, OnInit, OnDestroy } from '@angular/core';
-// ¡IMPORTANTE! Importamos RouterLink para que [routerLink] funcione en el HTML
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
+import { NotificationsComponent } from '../../notifications/notifications';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, NotificationsComponent],
   templateUrl: './header.html',
   styleUrls: ['./header.css']
 

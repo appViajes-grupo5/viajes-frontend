@@ -1,31 +1,53 @@
-<div class="rating-box p-2">
-  <h6 class="fw-bold mb-1">⭐ Valorar</h6>
+<div class="rating-box p-3">
+  @if (isSuccess()) {
+    <div class="alert alert-success mb-3 d-flex align-items-center" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <span>¡Calificación enviada correctamente!</span>
+    </div>
+  } @else {
+    <h6 class="fw-bold mb-3">
+      <i class="bi bi-star-fill text-warning me-1"></i>Valorar
+    </h6>
 
-  <!-- Estrellas -->
-  <div class="mb-1 d-flex align-items-center gap-1">
-    @for (star of [1,2,3,4,5]; track star) {
-      <i 
-        class="bi"
-        [class.bi-star-fill]="star <= score()"
-        [class.bi-star]="star > score()"
-        class="text-warning star-small"
-        (click)="setScore(star)">
-      </i>
-    }
-  </div>
+    <!-- Estrellas -->
+    <div class="mb-3 d-flex align-items-center gap-2">
+      @for (star of [1,2,3,4,5]; track star) {
+        <i 
+          class="bi rating-star-clickable"
+          [class.bi-star-fill]="star <= score()"
+          [class.bi-star]="star > score()"
+          [class.text-warning]="star <= score()"
+          [class.text-muted]="star > score()"
+          [class.disabled]="isSubmitting()"
+          (click)="!isSubmitting() && setScore(star)"
+          style="font-size: 1.5rem; cursor: pointer; transition: all 0.2s ease;">
+        </i>
+      }
+    </div>
 
-  <!-- Comentario -->
-  <textarea     
-    class="form-control form-control-sm rounded-2 mb-2"
-    rows="1"
-    placeholder="Comentario (opcional)"
-    (input)="onCommentChange($event)">
-  </textarea>
+    <!-- Comentario -->
+    <div class="mb-3">
+      <textarea     
+        class="form-control rounded-2"
+        rows="3"
+        placeholder="Comentario (opcional)"
+        [value]="comment()"
+        [disabled]="isSubmitting()"
+        (input)="onCommentChange($event)">
+      </textarea>
+    </div>
 
-  <!-- Botón enviar -->
-  <button 
-    class="btn btn-success btn-sm rounded-pill px-3"
-    (click)="submitRating()">
-    Enviar
-  </button>
+    <!-- Botón enviar -->
+    <button 
+      class="btn btn-success w-100 rounded-pill"
+      [disabled]="score() === 0 || isSubmitting()"
+      (click)="submitRating()">
+      @if (isSubmitting()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        Enviando...
+      } @else {
+        <i class="bi bi-send me-2"></i>Enviar Calificación
+      }
+    </button>
+  }
 </div>

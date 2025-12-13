@@ -1,44 +1,73 @@
 <div class="container mt-4">
-  <!-- Mensaje de Bienvenida -->
   <div class="alert alert-success" role="alert">
     <h4 class="alert-heading">¡Bienvenido, {{ userName }}!</h4>
-    <p class="mb-0">
-      Has iniciado sesión correctamente. Aquí puedes ver todos los viajes
-      disponibles.
-    </p>
   </div>
 
-  <!-- Contenido de la lista de viajes -->
   <div class="row">
     <div class="col-12 mb-3">
-      <h2>Lista de Viajes</h2>
+      <h2><i class="bi bi-airplane me-2"></i>Lista de Viajes</h2>
     </div>
 
-    @for (trip of trips; track trip.trip_id) {
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 shadow-sm">
-        <img [src]="getImage(trip)" class="card-img-top" alt="{{ trip.title }}"
-          style="height: 200px; object-fit: cover;">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">{{ trip.title }}</h5>
-          <p class="card-text text-muted"><small>{{ trip.destination }}</small></p>
-          <p class="card-text flex-grow-1">{{ trip.description | slice:0:100 }}...</p>
-          <div class="mt-auto">
-            <p class="card-text">
-              <strong>Fechas:</strong> {{ trip.start_date | date:'shortDate' }} - {{ trip.end_date | date:'shortDate' }}
-            </p>
-            <p class="card-text">
-              <strong>Precio:</strong> {{ trip.estimated_cost | currency:'EUR' }}
-            </p>
-            <button [routerLink]="['/viaje', trip.trip_id]" class="btn btn-primary w-100">Ver Detalles</button>
+    <div class="col-12">
+      <app-trip-filters
+        (filtersChange)="onFiltersChange($event)"
+        (clearFilters)="onClearFilters()"
+      ></app-trip-filters>
+    </div>
+
+    @if (isLoading()) {
+      <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3 text-muted">Cargando viajes...</p>
+      </div>
+    } @else {
+      @if (trips.length === 0) {
+        <div class="col-12">
+          <div class="alert alert-info text-center">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            <p class="mb-0">No se encontraron viajes con los filtros aplicados.</p>
           </div>
         </div>
-      </div>
-    </div>
-    } @empty {
-    <div class="col-12">
-      <p class="text-center">No hay viajes disponibles en este momento.</p>
-    </div>
+      } @else {
+        @for (trip of trips; track trip.trip_id) {
+          <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm trip-card">
+              <img [src]="getImageUrl(trip)" class="card-img-top" alt="{{ trip.title }}"
+                style="height: 200px; object-fit: cover;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ trip.title }}</h5>
+                <p class="card-text text-muted">
+                  <i class="bi bi-geo-alt me-1"></i><small>{{ trip.destination }}</small>
+                </p>
+                <p class="card-text flex-grow-1">{{ trip.description | slice:0:100 }}...</p>
+                <div class="mt-auto">
+                  <p class="card-text">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    <strong>Fechas:</strong> {{ trip.start_date | date:'shortDate' }} - {{ trip.end_date | date:'shortDate' }}
+                  </p>
+                  <p class="card-text">
+                    <i class="bi bi-currency-euro me-1"></i>
+                    <strong>Precio:</strong> {{ trip.estimated_cost | currency:'EUR' }}
+                  </p>
+                  <button [routerLink]="['/viaje', trip.trip_id]" class="btn btn-primary w-100">
+                    <i class="bi bi-eye me-1"></i>Ver Detalles
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      }
     }
   </div>
+
+  <app-trip-pagination
+    [currentPage]="currentPage()"
+    [totalPages]="totalPages()"
+    [total]="total()"
+    [limit]="limit"
+    (pageChange)="onPageChange($event)"
+  ></app-trip-pagination>
 </div>

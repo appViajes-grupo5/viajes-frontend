@@ -1,0 +1,26 @@
+.page-container {
+  background-color: #f8f9fa;
+  padding-top: 90px;
+  padding-bottom: 40px;
+  min-height: calc(100vh - 90px);
+}
+
+.loader {
+  padding: 14px;
+  margin: 18px 0;
+  text-align: center;
+  font-weight: 600;
+  background: rgba(0,0,0,0.04);
+  border-radius: 6px;
+}
+
+.trip-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+}
+
+.trip-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
+}
+
