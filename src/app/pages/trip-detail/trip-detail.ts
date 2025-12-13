@@ -56,9 +56,9 @@ export class TripDetailComponent implements OnInit {
     this.tripService.getTripById(id).subscribe({
       next: (trip) => {
         this.trip = trip;
-        // Determinar si soy el creador
-        if (this.currentUserId && trip.creator_id === this.currentUserId) {
-          this.isCreator = true;
+        // Calcular si soy el creador (usando conversión a número por seguridad)
+        if (this.trip && this.currentUserId) {
+          this.isCreator = Number(this.trip.creator_id) === Number(this.currentUserId);
         }
         // Una vez tenemos el viaje, cargamos quién va
         this.loadParticipants(id);

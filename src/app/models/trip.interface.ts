@@ -10,6 +10,7 @@ export interface Trip {
   min_participants: number;
   transport_details: string;
   itinerary: string;
+  creator_id?: number;
   image_url?: string;
   
   // Datos del creador (en el backend)
