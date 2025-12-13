@@ -7,8 +7,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TripService } from '../../../services/trip';
 import { TripMyListComponent } from '../../../pages/my-trip-list/trip-list';
+import { TripService } from '../../../services/trip.service';
 
 declare var bootstrap: any;
 
@@ -44,7 +44,7 @@ export class TripFormComponent {
       const formValues = this.tripForm.value;
       delete formValues.image_url;
 
-      this.tripService.addTrip(formValues).subscribe({
+      this.tripService.createTrip(formValues).subscribe({
         next: (response) => {
           const modal = document.getElementById('modalViaje');
           const modalInstance = bootstrap.Modal.getInstance(modal);

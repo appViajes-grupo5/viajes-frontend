@@ -7,8 +7,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TripService } from '../../../services/trip';
 import { TripMyListComponent } from '../../../pages/my-trip-list/trip-list';
+import { TripService } from '../../../services/trip.service';
 
 declare var bootstrap: any;
 
