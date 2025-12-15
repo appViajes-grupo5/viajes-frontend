@@ -28,7 +28,7 @@ export class TripListComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private tripService: TripService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const user = this.authService.getCurrentUser();
@@ -74,5 +74,10 @@ export class TripListComponent implements OnInit {
 
   getImageUrl(trip: Trip): string {
     return getTripImageUrl(trip);
+  }
+
+  formatDate(date: string | Date): string {
+    const d = new Date(date);
+    return d.toLocaleDateString();
   }
 }
