@@ -27,7 +27,7 @@ export class TripDetailComponent implements OnInit {
   trip?: Trip;
   participants: any[] = [];
   existingRatings: any[] = [];
-  
+
   currentUserId: number | null = null;
 
   isCreator: boolean = false;
@@ -37,27 +37,24 @@ export class TripDetailComponent implements OnInit {
   puedeValorar = signal<boolean>(false);
   usuariosParaValorar = signal<any[]>([]);
   selectedUserToRate = signal<number | null>(null);
-  
+
   tripStatus = signal<'upcoming' | 'ongoing' | 'finished'>('upcoming');
   puedeUnirse = signal<boolean>(true);
 
   ngOnInit() {
-    // 1. Obtener usuario actual (si existe) para saber quién navega
     const user = this.authService.getCurrentUser();
     if (user) {
       this.currentUserId = user.id;
     }
 
-    // 2. Obtener ID del viaje desde la URL
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    // 3. Cargar datos si el ID es válido
     if (id) {
       this.loadTripData(id);
     }
   }
 
-  // Carga secuencial: Viaje -> Participantes
+
   loadTripData(id: number) {
     this.tripService.getTripById(id).subscribe({
       next: (trip) => {
@@ -65,6 +62,7 @@ export class TripDetailComponent implements OnInit {
         if (this.trip && this.currentUserId) {
           this.isCreator = Number(this.trip.creator_id) === Number(this.currentUserId);
         }
+        this.calculateTripStatus();
         this.calcularPuedeUnirse();
         this.loadParticipants(id);
       },
@@ -73,6 +71,26 @@ export class TripDetailComponent implements OnInit {
         this.router.navigate(['/']);
       }
     });
+  }
+
+
+  private calculateTripStatus() {
+    if (!this.trip) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startDate = new Date(this.trip.start_date);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(this.trip.end_date);
+    endDate.setHours(0, 0, 0, 0);
+
+    if (today < startDate) {
+      this.tripStatus.set('upcoming');
+    } else if (today >= startDate && today <= endDate) {
+      this.tripStatus.set('ongoing');
+    } else {
+      this.tripStatus.set('finished');
+    }
   }
 
   loadParticipants(tripId: number) {
@@ -89,7 +107,6 @@ export class TripDetailComponent implements OnInit {
             this.isApproved = myRecord.status === 'accepted' || myRecord.status === 'approved';
           }
         }
-
         this.loadRatings(tripId);
       },
       error: (err) => console.error('Error cargando participantes', err)
@@ -121,23 +138,7 @@ export class TripDetailComponent implements OnInit {
       return;
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const startDate = new Date(this.trip.start_date);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(this.trip.end_date);
-    endDate.setHours(0, 0, 0, 0);
-
-    if (today < startDate) {
-      this.tripStatus.set('upcoming');
-    } else if (today >= startDate && today <= endDate) {
-      this.tripStatus.set('ongoing');
-    } else {
-      this.tripStatus.set('finished');
-    }
-
     this.calcularPuedeUnirse();
-
     const tripFinished = this.tripStatus() === 'finished';
 
     if (!tripFinished || !this.isApproved) {
@@ -150,7 +151,7 @@ export class TripDetailComponent implements OnInit {
       p => (p.status === 'approved' || p.status === 'accepted') && Number(p.user_id) !== Number(this.currentUserId)
     );
 
-    const creatorIsApproved = this.trip.creator_id && 
+    const creatorIsApproved = this.trip.creator_id &&
       Number(this.trip.creator_id) !== Number(this.currentUserId) &&
       (this.isCreator || approvedParticipants.some(p => Number(p.user_id) === Number(this.trip?.creator_id)));
 
@@ -192,7 +193,7 @@ export class TripDetailComponent implements OnInit {
       const usuarioSigueDisponible = usuariosDisponibles.some(
         u => Number(u.user_id) === Number(usuarioActual)
       );
-      
+
       if (!usuarioSigueDisponible || !usuarioActual) {
         this.selectedUserToRate.set(usuariosDisponibles[0].user_id);
       }
@@ -203,7 +204,7 @@ export class TripDetailComponent implements OnInit {
 
   onRatingSubmitted = () => {
     if (!this.trip) return;
-    
+
     this.isRefreshingRatings.set(true);
     this.loadRatings(this.trip.trip_id);
   }
@@ -222,8 +223,8 @@ export class TripDetailComponent implements OnInit {
     today.setHours(0, 0, 0, 0);
     const startDate = new Date(this.trip.start_date);
     startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(this.trip.end_date);
-    endDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(this.trip.end_date); // Not used in this function but good to have
+    // remove unused let if strictly linted, but keeping context
 
     const puedeUnirse = today < startDate;
     this.puedeUnirse.set(puedeUnirse);
@@ -242,7 +243,7 @@ export class TripDetailComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    
+
     if (this.isCreator) {
       alert('Eres el creador del viaje, no necesitas unirte.');
       return;
@@ -342,7 +343,7 @@ export class TripDetailComponent implements OnInit {
   rejectParticipant(userId: number) {
     if (!this.trip) return;
     if (!confirm('¿Estás seguro de rechazar esta solicitud?')) return;
-    
+
     this.tripService.updateParticipantStatus(this.trip.trip_id, userId, 'rejected').subscribe({
       next: () => {
         this.loadParticipants(this.trip!.trip_id);

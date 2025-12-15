@@ -45,7 +45,8 @@
                 <div class="mt-auto">
                   <p class="card-text">
                     <i class="bi bi-calendar3 me-1"></i>
-                    <strong>Fechas:</strong> {{ trip.start_date | date:'shortDate' }} - {{ trip.end_date | date:'shortDate' }}
+                     <strong>Fechas:</strong> {{ formatDate(trip.start_date) }} - {{
+              formatDate(trip.end_date) }}
                   </p>
                   <p class="card-text">
                     <i class="bi bi-currency-euro me-1"></i>
